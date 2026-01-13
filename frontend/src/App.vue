@@ -67,9 +67,6 @@ onMounted(() => {
           <div class="text-center mt-2">
             <div class="text-4xl mb-2 grayscale group-hover:grayscale-0 transition-all">🥈</div>
             <div class="font-bold text-xl text-slate-800 truncate">{{ topThree[1].name }}</div>
-            <div class="inline-block px-2 py-0.5 mt-1 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500">
-               {{ topThree[1].bedId === 0 ? 'Left Bed' : 'Right Bed' }}
-            </div>
             <div class="text-2xl font-mono font-bold text-slate-400 mt-2">{{ topThree[1].score.toLocaleString() }}</div>
           </div>
         </div>
@@ -80,10 +77,6 @@ onMounted(() => {
             <div class="text-6xl mb-4 animate-bounce">🏆</div>
             <div class="text-emerald-600 text-xs font-black uppercase tracking-widest mb-2">Current Champion</div>
             <div class="font-black text-2xl md:text-3xl text-slate-900 truncate mb-2">{{ topThree[0].name }}</div>
-            
-            <div class="inline-block px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-700 mb-4">
-              {{ topThree[0].bedId === 0 ? 'LEFT BED' : 'RIGHT BED' }}
-            </div>
 
             <div class="text-5xl font-mono font-black text-emerald-600 tracking-tight">
               {{ topThree[0].score.toLocaleString() }}
@@ -96,9 +89,6 @@ onMounted(() => {
           <div class="text-center mt-2">
             <div class="text-4xl mb-2 grayscale group-hover:grayscale-0 transition-all">🥉</div>
             <div class="font-bold text-xl text-slate-800 truncate">{{ topThree[2].name }}</div>
-            <div class="inline-block px-2 py-0.5 mt-1 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-500">
-               {{ topThree[2].bedId === 0 ? 'Left Bed' : 'Right Bed' }}
-            </div>
             <div class="text-2xl font-mono font-bold text-slate-400 mt-2">{{ topThree[2].score.toLocaleString() }}</div>
           </div>
         </div>
