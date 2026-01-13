@@ -18,7 +18,6 @@ import { AppService } from './app.service';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASS,
       database: process.env.DATABASE_NAME,
-      entities: [],
       synchronize: true,
       autoLoadEntities: true,
     }),

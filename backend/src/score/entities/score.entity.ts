@@ -1,19 +1,19 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
-@Entity() // บอกว่าเป็นตารางใน Database
+@Entity()
 export class Score {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  playerName: string; // ชื่อคนเล่น
+  name: string;  // 👈 แก้จุดที่ 1: เปลี่ยนจาก playerName เป็น name (เพื่อให้ตรงกับ Frontend)
 
   @Column()
-  score: number;      // คะแนนที่ได้
+  score: number;
 
-  @Column()
-  bedId: number;      // เตียงไหน (0=ซ้าย, 1=ขวา)
+  @Column({ nullable: true })
+  bedId: number; // 👈 แก้จุดที่ 2: เติม { nullable: true } (แปลว่าถ้าไม่มีค่านี้ส่งมา ก็ไม่ error)
 
   @CreateDateColumn()
-  createdAt: Date;    // วันเวลาที่บันทึก (ระบบลงให้เอง)
+  createdAt: Date;
 }
