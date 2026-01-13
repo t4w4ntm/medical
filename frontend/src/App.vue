@@ -3,9 +3,9 @@ import { ref, onMounted, computed } from 'vue';
 
 interface Score {
   id: number;
-  playerName: string;
+  name: string;
   score: number;
-  bedId: number;
+  bedId: number | null;
 }
 
 const scores = ref<Score[]>([]);
