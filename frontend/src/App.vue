@@ -121,12 +121,6 @@ onMounted(() => {
               <div class="font-bold text-slate-700 truncate group-hover:text-emerald-700 transition-colors text-lg">
                 {{ item.name }}
               </div>
-              <div class="flex items-center gap-2 mt-0.5">
-                <span class="text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200 font-bold uppercase">
-                  {{ item.bedId === 0 ? 'Left Side' : 'Right Side' }}
-                </span>
-                <span class="text-[10px] text-slate-400 md:hidden">ID: {{ item.id }}</span>
-              </div>
             </div>
 
             <div class="text-right pl-4 border-l border-slate-100">
