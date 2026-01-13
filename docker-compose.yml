@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # ------------------------------------
+  # 1. Database (MySQL)
+  # ------------------------------------
+  mysql_db:
+    image: mysql:8.0
+    container_name: tawan_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  # รหัสผ่าน Root (เปลี่ยนได้)
+      MYSQL_DATABASE: tawan_db           # ชื่อ Database หลัก
+      MYSQL_USER: tawan_user             # User ทั่วไป
+      MYSQL_PASSWORD: tawan_password     # รหัสผ่าน User
+    # ports:
+    #   - "3306:3306" # เปิด Port ให้เครื่องเราใช้ Tool ภายนอกต่อเข้าไปได้
+    volumes:
+      - db_data:/var/lib/mysql           # เก็บข้อมูลถาวร แม้ลบ Container ข้อมูลไม่หาย
+    networks:
+      - app_network
+
+  # ------------------------------------
+  # 2. Database Management (phpMyAdmin) - แถมให้
+  # ------------------------------------
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: tawan_pma
+    environment:
+      PMA_HOST: mysql_db
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    ports:
+      - "8080:80" # เข้าผ่าน http://localhost:8080
+    depends_on:
+      - mysql_db
+    networks:
+      - app_network
+
+  # ------------------------------------
+  # 3. Backend (Nest.js)
+  # ------------------------------------
+  backend:
+    build: ./backend
+    container_name: tawan_backend
+    restart: always
+    ports:
+      - "3000:3000" # API จะอยู่ที่ http://localhost:3000
+    environment:
+      DATABASE_HOST: ${DB_HOST}
+      DATABASE_USER: ${DB_USER}
+      DATABASE_PASS: ${DB_PASSWORD}
+      DATABASE_NAME: ${DB_NAME}
+    depends_on:
+      - mysql_db
+    networks:
+      - app_network
+
+  # ------------------------------------
+  # 4. Frontend (Vue.js)
+  # ------------------------------------
+  frontend:
+    build: ./frontend
+    container_name: tawan_frontend
+    restart: always
+    ports:
+      - "80:80" # หน้าเว็บเข้าผ่าน http://localhost (Port 80)
+    depends_on:
+      - backend
+    networks:
+      - app_network
+
+volumes:
+  db_data:
+
+networks:
+  app_network:
+    driver: bridge
