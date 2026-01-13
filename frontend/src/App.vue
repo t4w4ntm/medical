@@ -5,7 +5,6 @@ interface Score {
   id: number;
   name: string;
   score: number;
-  bedId: number | null;
 }
 
 const scores = ref<Score[]>([]);
