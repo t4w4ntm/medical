@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 
+// ✅ Interface ตรงกับ Database เป๊ะๆ (ไม่มี bedId แล้ว)
 interface Score {
   id: number;
   name: string;
@@ -12,11 +13,11 @@ const isLoaded = ref(false);
 
 const fetchScores = async () => {
   try {
-    // แก้บรรทัดนี้: ดึง URL มาจาก .env แทนการพิมพ์เอง
     const apiUrl = import.meta.env.VITE_API_URL || 'https://medical-production-396d.up.railway.app/score';
     const res = await fetch(`${apiUrl}/score`);
     
     const data = await res.json();
+    // เรียงคะแนนจากมากไปน้อย
     scores.value = data.sort((a: Score, b: Score) => b.score - a.score);
     isLoaded.value = true;
   } catch (error) {
@@ -29,6 +30,7 @@ const restOfList = computed(() => scores.value.slice(3));
 
 onMounted(() => {
   fetchScores();
+  // ดึงข้อมูลใหม่ทุกๆ 2 วินาที (Realtime)
   setInterval(fetchScores, 2000);
 });
 </script>
@@ -62,6 +64,7 @@ onMounted(() => {
         class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 mb-12 items-end"
         v-if="scores.length > 0"
       >
+        
         <div v-if="topThree[1]" class="order-2 md:order-1 bg-white border border-slate-200 p-6 rounded-xl shadow-lg transform transition hover:-translate-y-2 duration-300 relative group">
           <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-200 text-slate-600 px-3 py-0.5 rounded-full text-xs font-bold shadow-sm">RANK 2</div>
           <div class="text-center mt-2">
@@ -77,7 +80,7 @@ onMounted(() => {
             <div class="text-6xl mb-4 animate-bounce">🏆</div>
             <div class="text-emerald-600 text-xs font-black uppercase tracking-widest mb-2">Current Champion</div>
             <div class="font-black text-2xl md:text-3xl text-slate-900 truncate mb-2">{{ topThree[0].name }}</div>
-
+            
             <div class="text-5xl font-mono font-black text-emerald-600 tracking-tight">
               {{ topThree[0].score.toLocaleString() }}
             </div>
@@ -93,7 +96,6 @@ onMounted(() => {
           </div>
         </div>
       </TransitionGroup>
-
 
       <div class="space-y-3">
         <div class="flex items-center gap-4 mb-4">
@@ -120,6 +122,9 @@ onMounted(() => {
             <div class="flex-1 min-w-0 pr-4">
               <div class="font-bold text-slate-700 truncate group-hover:text-emerald-700 transition-colors text-lg">
                 {{ item.name }}
+              </div>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span class="text-[10px] text-slate-400 md:hidden">ID: {{ item.id }}</span>
               </div>
             </div>
 
