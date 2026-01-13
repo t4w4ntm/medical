@@ -14,7 +14,7 @@ const isLoaded = ref(false);
 const fetchScores = async () => {
   try {
     // แก้บรรทัดนี้: ดึง URL มาจาก .env แทนการพิมพ์เอง
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const apiUrl = import.meta.env.VITE_API_URL || 'https://medical-production-396d.up.railway.app/score';
     const res = await fetch(`${apiUrl}/score`);
     
     const data = await res.json();
