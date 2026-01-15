@@ -6,10 +6,19 @@ export class Score {
   id: number;
 
   @Column()
-  name: string; 
+  name: string;
 
   @Column()
-  score: number;
+  time: number; // เวลาที่ใช้ (วินาที)
+
+  @Column()
+  timeScore: number; // คะแนนจากเวลา
+
+  @Column()
+  questionScore: number; // คะแนนจากการตอบคำถาม
+
+  @Column()
+  totalScore: number; // คะแนนรวม (timeScore + questionScore)
 
   @CreateDateColumn()
   createdAt: Date;

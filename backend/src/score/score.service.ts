@@ -9,7 +9,7 @@ export class ScoreService {
   constructor(
     @InjectRepository(Score)
     private scoreRepository: Repository<Score>,
-  ) {}
+  ) { }
 
   // ฟังก์ชันบันทึกคะแนน
   create(createScoreDto: CreateScoreDto) {
@@ -20,7 +20,7 @@ export class ScoreService {
   findAll() {
     return this.scoreRepository.find({
       order: {
-        score: 'DESC', // เรียงคะแนนมากสุดขึ้นก่อน (Leaderboard)
+        totalScore: 'DESC', // เรียงคะแนนรวมมากสุดขึ้นก่อน (Leaderboard)
       },
       take: 10, // (Optional) ดึงแค่ 10 อันดับแรก
     });
