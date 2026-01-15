@@ -273,6 +273,9 @@ onMounted(() => {
     border: 1px solid #e2e8f0 !important;
     height: 100px !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   /* Hide rank badges on mobile podium */
