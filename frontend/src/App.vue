@@ -212,7 +212,7 @@ onMounted(() => {
         @click.self="closeModal"
       >
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="closeModal"></div>
 
         <!-- Modal Content -->
         <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform">
@@ -242,57 +242,54 @@ onMounted(() => {
             <h2 class="text-2xl font-bold text-slate-800">Player Details</h2>
           </div>
 
-          <!-- Player Info -->
-          <div v-if="selectedPlayer" class="space-y-4">
+          <!-- Player Info - List Layout -->
+          <div v-if="selectedPlayer" class="space-y-3">
             <!-- Name -->
-            <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
-              <div class="text-xs text-emerald-600 font-semibold uppercase tracking-wide mb-1">
-                Name
-              </div>
-              <div class="text-xl font-bold text-emerald-700">{{ selectedPlayer.name }}</div>
+            <div
+              class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg border border-emerald-200"
+            >
+              <span class="text-sm font-medium text-emerald-600">Name</span>
+              <span class="text-lg font-bold text-emerald-700">{{ selectedPlayer.name }}</span>
             </div>
 
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-2 gap-3">
-              <!-- Time -->
-              <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
-                <div class="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-1">
-                  Time
-                </div>
-                <div class="text-lg font-bold text-slate-700">
-                  {{ formatTime(selectedPlayer.time) }}
-                </div>
-              </div>
+            <!-- Time -->
+            <div
+              class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200"
+            >
+              <span class="text-sm font-medium text-slate-500">Time</span>
+              <span class="text-lg font-bold text-slate-700">{{
+                formatTime(selectedPlayer.time)
+              }}</span>
+            </div>
 
-              <!-- Time Score -->
-              <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                <div class="text-xs text-blue-600 font-semibold uppercase tracking-wide mb-1">
-                  Time Score
-                </div>
-                <div class="text-lg font-bold text-blue-700">
-                  {{ selectedPlayer.timeScore.toLocaleString() }}
-                </div>
-              </div>
+            <!-- Time Score -->
+            <div
+              class="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200"
+            >
+              <span class="text-sm font-medium text-blue-600">Time Score</span>
+              <span class="text-lg font-bold text-blue-700">{{
+                selectedPlayer.timeScore.toLocaleString()
+              }}</span>
+            </div>
 
-              <!-- Question Score -->
-              <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
-                <div class="text-xs text-purple-600 font-semibold uppercase tracking-wide mb-1">
-                  Question Score
-                </div>
-                <div class="text-lg font-bold text-purple-700">
-                  {{ selectedPlayer.questionScore.toLocaleString() }}
-                </div>
-              </div>
+            <!-- Question Score -->
+            <div
+              class="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200"
+            >
+              <span class="text-sm font-medium text-purple-600">Question Score</span>
+              <span class="text-lg font-bold text-purple-700">{{
+                selectedPlayer.questionScore.toLocaleString()
+              }}</span>
+            </div>
 
-              <!-- Total Score -->
-              <div class="bg-amber-50 rounded-xl p-4 border border-amber-200">
-                <div class="text-xs text-amber-600 font-semibold uppercase tracking-wide mb-1">
-                  Total Score
-                </div>
-                <div class="text-lg font-bold text-amber-700">
-                  {{ selectedPlayer.totalScore.toLocaleString() }}
-                </div>
-              </div>
+            <!-- Total Score -->
+            <div
+              class="flex items-center justify-between p-3 bg-amber-50 rounded-lg border border-amber-200"
+            >
+              <span class="text-sm font-medium text-amber-600">Total Score</span>
+              <span class="text-lg font-bold text-amber-700">{{
+                selectedPlayer.totalScore.toLocaleString()
+              }}</span>
             </div>
 
             <!-- Close Button -->
