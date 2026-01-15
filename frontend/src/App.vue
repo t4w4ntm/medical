@@ -92,7 +92,8 @@ onMounted(() => {
       <TransitionGroup
         tag="div"
         name="podium"
-        class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 mb-12 items-end"
+        class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 mb-12 items-end justify-center"
+        :class="{ 'md:flex md:justify-center': scores.length === 1 }"
         v-if="scores.length > 0"
       >
         <div
@@ -238,7 +239,6 @@ onMounted(() => {
 
           <!-- Header -->
           <div class="text-center mb-6">
-            <div class="text-4xl mb-2">📊</div>
             <h2 class="text-2xl font-bold text-slate-800">Player Details</h2>
           </div>
 
@@ -257,7 +257,7 @@ onMounted(() => {
               <!-- Time -->
               <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
                 <div class="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-1">
-                  ⏱️ Time
+                  Time
                 </div>
                 <div class="text-lg font-bold text-slate-700">
                   {{ formatTime(selectedPlayer.time) }}
@@ -267,7 +267,7 @@ onMounted(() => {
               <!-- Time Score -->
               <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
                 <div class="text-xs text-blue-600 font-semibold uppercase tracking-wide mb-1">
-                  ⚡ Time Score
+                  Time Score
                 </div>
                 <div class="text-lg font-bold text-blue-700">
                   {{ selectedPlayer.timeScore.toLocaleString() }}
@@ -277,7 +277,7 @@ onMounted(() => {
               <!-- Question Score -->
               <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
                 <div class="text-xs text-purple-600 font-semibold uppercase tracking-wide mb-1">
-                  ❓ Question Score
+                  Question Score
                 </div>
                 <div class="text-lg font-bold text-purple-700">
                   {{ selectedPlayer.questionScore.toLocaleString() }}
@@ -287,7 +287,7 @@ onMounted(() => {
               <!-- Total Score -->
               <div class="bg-amber-50 rounded-xl p-4 border border-amber-200">
                 <div class="text-xs text-amber-600 font-semibold uppercase tracking-wide mb-1">
-                  🏆 Total Score
+                  Total Score
                 </div>
                 <div class="text-lg font-bold text-amber-700">
                   {{ selectedPlayer.totalScore.toLocaleString() }}
