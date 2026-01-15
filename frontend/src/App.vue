@@ -1,15 +1,39 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 
-// ✅ Interface ตรงกับ Database เป๊ะๆ (ไม่มี bedId แล้ว)
+// ✅ Interface ตรงกับ Database ใหม่
 interface Score {
   id: number
   name: string
-  score: number
+  time: number // เวลาที่ใช้ (วินาที)
+  timeScore: number // คะแนนจากเวลา
+  questionScore: number // คะแนนจากการตอบคำถาม
+  totalScore: number // คะแนนรวม
 }
 
 const scores = ref<Score[]>([])
 const isLoaded = ref(false)
+
+// Modal state
+const showModal = ref(false)
+const selectedPlayer = ref<Score | null>(null)
+
+const openModal = (player: Score) => {
+  selectedPlayer.value = player
+  showModal.value = true
+}
+
+const closeModal = () => {
+  showModal.value = false
+  selectedPlayer.value = null
+}
+
+// Format time from seconds to mm:ss
+const formatTime = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60)
+  const secs = seconds % 60
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+}
 
 const fetchScores = async () => {
   try {
@@ -18,8 +42,8 @@ const fetchScores = async () => {
     const res = await fetch(`${apiUrl}/score`)
 
     const data = await res.json()
-    // เรียงคะแนนจากมากไปน้อย
-    scores.value = data.sort((a: Score, b: Score) => b.score - a.score)
+    // เรียงคะแนนจากมากไปน้อย (ใช้ totalScore)
+    scores.value = data.sort((a: Score, b: Score) => b.totalScore - a.totalScore)
     isLoaded.value = true
   } catch (error) {
     console.error('Error fetching scores:', error)
@@ -56,7 +80,7 @@ onMounted(() => {
     <div class="relative z-10 max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
       <header class="text-center mb-12">
         <h1 class="text-4xl md:text-5xl font-black tracking-tight mb-2 text-slate-800">
-          SIMULATION <span class="text-emerald-600">LEADERBOARD</span>
+          GOMED <span class="text-emerald-600">LEADERBOARD</span>
         </h1>
         <p
           class="text-slate-500 text-sm md:text-base uppercase tracking-[0.2em] font-medium bg-white/80 inline-block px-4 py-1 rounded-full backdrop-blur-sm border border-slate-200"
@@ -73,7 +97,8 @@ onMounted(() => {
       >
         <div
           v-if="topThree[1]"
-          class="order-2 md:order-1 bg-white border border-slate-200 p-6 rounded-xl shadow-lg transform transition hover:-translate-y-2 duration-300 relative group"
+          @click="openModal(topThree[1])"
+          class="order-2 md:order-1 bg-white border border-slate-200 p-6 rounded-xl shadow-lg transform transition hover:-translate-y-2 duration-300 relative group cursor-pointer"
         >
           <div
             class="absolute -top-3 left-1/2 -translate-x-1/2 bg-slate-200 text-slate-600 px-3 py-0.5 rounded-full text-xs font-bold shadow-sm"
@@ -84,14 +109,15 @@ onMounted(() => {
             <div class="text-4xl mb-2 grayscale group-hover:grayscale-0 transition-all">🥈</div>
             <div class="font-bold text-xl text-slate-800 truncate">{{ topThree[1].name }}</div>
             <div class="text-2xl font-mono font-bold text-slate-400 mt-2">
-              {{ topThree[1].score.toLocaleString() }}
+              {{ topThree[1].totalScore.toLocaleString() }}
             </div>
           </div>
         </div>
 
         <div
           v-if="topThree[0]"
-          class="order-1 md:order-2 bg-white border-2 border-emerald-500 p-8 rounded-2xl shadow-2xl shadow-emerald-500/20 transform transition hover:-translate-y-2 duration-300 relative overflow-hidden z-20"
+          @click="openModal(topThree[0])"
+          class="order-1 md:order-2 bg-white border-2 border-emerald-500 p-8 rounded-2xl shadow-2xl shadow-emerald-500/20 transform transition hover:-translate-y-2 duration-300 relative overflow-hidden z-20 cursor-pointer"
         >
           <div class="absolute top-0 left-0 w-full h-2 bg-emerald-500"></div>
           <div class="text-center">
@@ -104,14 +130,15 @@ onMounted(() => {
             </div>
 
             <div class="text-5xl font-mono font-black text-emerald-600 tracking-tight">
-              {{ topThree[0].score.toLocaleString() }}
+              {{ topThree[0].totalScore.toLocaleString() }}
             </div>
           </div>
         </div>
 
         <div
           v-if="topThree[2]"
-          class="order-3 md:order-3 bg-white border border-slate-200 p-6 rounded-xl shadow-lg transform transition hover:-translate-y-2 duration-300 relative group"
+          @click="openModal(topThree[2])"
+          class="order-3 md:order-3 bg-white border border-slate-200 p-6 rounded-xl shadow-lg transform transition hover:-translate-y-2 duration-300 relative group cursor-pointer"
         >
           <div
             class="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-100 text-orange-800 px-3 py-0.5 rounded-full text-xs font-bold shadow-sm"
@@ -122,7 +149,7 @@ onMounted(() => {
             <div class="text-4xl mb-2 grayscale group-hover:grayscale-0 transition-all">🥉</div>
             <div class="font-bold text-xl text-slate-800 truncate">{{ topThree[2].name }}</div>
             <div class="text-2xl font-mono font-bold text-slate-400 mt-2">
-              {{ topThree[2].score.toLocaleString() }}
+              {{ topThree[2].totalScore.toLocaleString() }}
             </div>
           </div>
         </div>
@@ -140,7 +167,8 @@ onMounted(() => {
           <div
             v-for="(item, index) in restOfList"
             :key="item.id"
-            class="group flex items-center bg-white border border-slate-200 hover:border-emerald-400 rounded-lg p-4 transition-all duration-200 shadow-sm hover:shadow-md hover:bg-emerald-50/30"
+            @click="openModal(item)"
+            class="group flex items-center bg-white border border-slate-200 hover:border-emerald-400 rounded-lg p-4 transition-all duration-200 shadow-sm hover:shadow-md hover:bg-emerald-50/30 cursor-pointer"
           >
             <div
               class="w-12 text-center font-mono text-slate-400 font-bold text-lg group-hover:text-emerald-600"
@@ -160,7 +188,7 @@ onMounted(() => {
 
             <div class="text-right pl-4 border-l border-slate-100">
               <div class="font-mono text-xl font-bold text-slate-600 group-hover:text-emerald-600">
-                {{ item.score.toLocaleString() }}
+                {{ item.totalScore.toLocaleString() }}
               </div>
             </div>
           </div>
@@ -174,10 +202,128 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
+    <!-- Modal -->
+    <Transition name="modal">
+      <div
+        v-if="showModal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        @click.self="closeModal"
+      >
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+        <!-- Modal Content -->
+        <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform">
+          <!-- Close Button -->
+          <button
+            @click="closeModal"
+            class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+
+          <!-- Header -->
+          <div class="text-center mb-6">
+            <div class="text-4xl mb-2">📊</div>
+            <h2 class="text-2xl font-bold text-slate-800">Player Details</h2>
+          </div>
+
+          <!-- Player Info -->
+          <div v-if="selectedPlayer" class="space-y-4">
+            <!-- Name -->
+            <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
+              <div class="text-xs text-emerald-600 font-semibold uppercase tracking-wide mb-1">
+                Name
+              </div>
+              <div class="text-xl font-bold text-emerald-700">{{ selectedPlayer.name }}</div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 gap-3">
+              <!-- Time -->
+              <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                <div class="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-1">
+                  ⏱️ Time
+                </div>
+                <div class="text-lg font-bold text-slate-700">
+                  {{ formatTime(selectedPlayer.time) }}
+                </div>
+              </div>
+
+              <!-- Time Score -->
+              <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                <div class="text-xs text-blue-600 font-semibold uppercase tracking-wide mb-1">
+                  ⚡ Time Score
+                </div>
+                <div class="text-lg font-bold text-blue-700">
+                  {{ selectedPlayer.timeScore.toLocaleString() }}
+                </div>
+              </div>
+
+              <!-- Question Score -->
+              <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
+                <div class="text-xs text-purple-600 font-semibold uppercase tracking-wide mb-1">
+                  ❓ Question Score
+                </div>
+                <div class="text-lg font-bold text-purple-700">
+                  {{ selectedPlayer.questionScore.toLocaleString() }}
+                </div>
+              </div>
+
+              <!-- Total Score -->
+              <div class="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                <div class="text-xs text-amber-600 font-semibold uppercase tracking-wide mb-1">
+                  🏆 Total Score
+                </div>
+                <div class="text-lg font-bold text-amber-700">
+                  {{ selectedPlayer.totalScore.toLocaleString() }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Close Button -->
+            <button
+              @click="closeModal"
+              class="w-full mt-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-6 rounded-xl transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
 <style scoped>
+/* Modal Animation */
+.modal-enter-active,
+.modal-leave-active {
+  transition: all 0.3s ease;
+}
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+.modal-enter-from .relative,
+.modal-leave-to .relative {
+  transform: scale(0.9);
+}
+
 /* Podium Animation */
 .podium-enter-active,
 .podium-leave-active {
