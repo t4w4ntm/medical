@@ -251,7 +251,7 @@ onMounted(() => {
     order: 1 !important;
     background: white !important;
     border: 1px solid #e2e8f0 !important;
-    height: 140px !important;
+    height: 110px !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
   }
 
@@ -260,7 +260,7 @@ onMounted(() => {
     order: 2 !important;
     background: white !important;
     border: 2px solid #10b981 !important;
-    height: 170px !important;
+    height: 130px !important;
     padding: 1rem 0.5rem !important;
     box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2) !important;
     z-index: 10 !important;
@@ -271,7 +271,7 @@ onMounted(() => {
     order: 3 !important;
     background: white !important;
     border: 1px solid #e2e8f0 !important;
-    height: 130px !important;
+    height: 100px !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
   }
 
