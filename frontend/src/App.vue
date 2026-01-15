@@ -242,52 +242,107 @@ onMounted(() => {
             <h2 class="text-2xl font-bold text-slate-800">Player Details</h2>
           </div>
 
-          <!-- Player Info - List Layout -->
-          <div v-if="selectedPlayer" class="space-y-3">
+          <!-- Player Info - List Layout with Icons -->
+          <div v-if="selectedPlayer" class="divide-y divide-gray-100">
             <!-- Name -->
-            <div
-              class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg border border-emerald-200"
-            >
-              <span class="text-sm font-medium text-emerald-600">Name</span>
-              <span class="text-lg font-bold text-emerald-700">{{ selectedPlayer.name }}</span>
+            <div class="flex items-center py-3">
+              <svg
+                class="w-5 h-5 text-emerald-500 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+              <span class="flex-1 text-sm text-gray-500">Name</span>
+              <span class="text-base font-semibold text-gray-800">{{ selectedPlayer.name }}</span>
             </div>
 
             <!-- Time -->
-            <div
-              class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200"
-            >
-              <span class="text-sm font-medium text-slate-500">Time</span>
-              <span class="text-lg font-bold text-slate-700">{{
+            <div class="flex items-center py-3">
+              <svg
+                class="w-5 h-5 text-emerald-500 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span class="flex-1 text-sm text-gray-500">Time</span>
+              <span class="text-base font-semibold text-gray-800">{{
                 formatTime(selectedPlayer.time)
               }}</span>
             </div>
 
             <!-- Time Score -->
-            <div
-              class="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200"
-            >
-              <span class="text-sm font-medium text-blue-600">Time Score</span>
-              <span class="text-lg font-bold text-blue-700">{{
+            <div class="flex items-center py-3">
+              <svg
+                class="w-5 h-5 text-emerald-500 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+              <span class="flex-1 text-sm text-gray-500">Time Score</span>
+              <span class="text-base font-semibold text-gray-800">{{
                 selectedPlayer.timeScore.toLocaleString()
               }}</span>
             </div>
 
             <!-- Question Score -->
-            <div
-              class="flex items-center justify-between p-3 bg-purple-50 rounded-lg border border-purple-200"
-            >
-              <span class="text-sm font-medium text-purple-600">Question Score</span>
-              <span class="text-lg font-bold text-purple-700">{{
+            <div class="flex items-center py-3">
+              <svg
+                class="w-5 h-5 text-emerald-500 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span class="flex-1 text-sm text-gray-500">Question Score</span>
+              <span class="text-base font-semibold text-gray-800">{{
                 selectedPlayer.questionScore.toLocaleString()
               }}</span>
             </div>
 
             <!-- Total Score -->
-            <div
-              class="flex items-center justify-between p-3 bg-amber-50 rounded-lg border border-amber-200"
-            >
-              <span class="text-sm font-medium text-amber-600">Total Score</span>
-              <span class="text-lg font-bold text-amber-700">{{
+            <div class="flex items-center py-3">
+              <svg
+                class="w-5 h-5 text-emerald-500 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                />
+              </svg>
+              <span class="flex-1 text-sm text-gray-500">Total Score</span>
+              <span class="text-base font-semibold text-emerald-600">{{
                 selectedPlayer.totalScore.toLocaleString()
               }}</span>
             </div>
