@@ -8,17 +8,17 @@ export class Score {
   @Column()
   name: string;
 
-  @Column()
-  time: number; // เวลาที่ใช้ (วินาที)
+  @Column({ nullable: true }) // อนุญาตให้เป็นค่าว่างได้ (กันเหนียว)
+  time: string;
 
-  @Column()
-  timeScore: number; // คะแนนจากเวลา
+  @Column({ type: 'int', default: 0 })
+  timeScore: number;
 
-  @Column()
-  questionScore: number; // คะแนนจากการตอบคำถาม
+  @Column({ type: 'int', default: 0 })
+  questionScore: number;
 
-  @Column()
-  totalScore: number; // คะแนนรวม (timeScore + questionScore)
+  @Column({ type: 'int', default: 0 })
+  totalScore: number; // 👈 ตัวนี้สำคัญ! ต้องมีให้ตรงกับ DB
 
   @CreateDateColumn()
   createdAt: Date;
