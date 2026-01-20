@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 interface ScoreDetail {
   id: number
@@ -21,9 +22,17 @@ interface Score {
   details?: ScoreDetail[] // Optional because it might not be loaded in list view unless we fetch it
 }
 
+const router = useRouter()
+
 const scores = ref<Score[]>([])
 const loading = ref(true)
 const searchTerm = ref('')
+
+const handleLogout = () => {
+  localStorage.removeItem('isAuthenticated')
+  localStorage.removeItem('user')
+  router.push('/login')
+}
 
 // Sorting
 type SortKey = 'createdAt' | 'name' | 'time' | 'timeScore' | 'questionScore' | 'totalScore'
@@ -147,6 +156,10 @@ onMounted(() => {
           
           <button @click="fetchScores" class="p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-sm text-slate-600 transition-colors" title="Refresh">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          </button>
+          
+          <button @click="handleLogout" class="p-2 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg shadow-sm text-red-600 transition-colors" title="Logout">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
           </button>
         </div>
       </header>
