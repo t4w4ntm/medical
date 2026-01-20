@@ -17,12 +17,36 @@ interface Score {
   timeScore: number
   questionScore: number
   totalScore: number
+  createdAt: string
   details?: ScoreDetail[] // Optional because it might not be loaded in list view unless we fetch it
 }
 
 const scores = ref<Score[]>([])
 const loading = ref(true)
 const searchTerm = ref('')
+
+// Sorting
+type SortKey = 'createdAt' | 'name' | 'time' | 'timeScore' | 'questionScore' | 'totalScore'
+const sortKey = ref<SortKey>('createdAt')
+const sortOrder = ref<'asc' | 'desc'>('desc')
+
+const sortBy = (key: SortKey) => {
+  if (sortKey.value === key) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortKey.value = key
+    sortOrder.value = 'desc' // Default to desc for numbers usually
+  }
+}
+
+// Format Date
+const formatDate = (dateString: string): string => {
+  if (!dateString) return '-'
+  return new Date(dateString).toLocaleString('th-TH', {
+    dateStyle: 'short',
+    timeStyle: 'short'
+  })
+}
 
 // Modal
 const showModal = ref(false)
@@ -78,9 +102,22 @@ const closeModal = () => {
 }
 
 const filteredScores = computed(() => {
-  return scores.value.filter(s => 
+  let result = scores.value.filter(s => 
     s.name.toLowerCase().includes(searchTerm.value.toLowerCase())
   )
+  
+  return result.sort((a, b) => {
+    let modifier = sortOrder.value === 'asc' ? 1 : -1
+    
+    if (sortKey.value === 'name') {
+      return a.name.localeCompare(b.name) * modifier
+    } else if (sortKey.value === 'createdAt') {
+      return (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) * modifier
+    } else {
+      // Numbers
+      return (a[sortKey.value] - b[sortKey.value]) * modifier
+    }
+  })
 })
 
 onMounted(() => {
@@ -119,13 +156,31 @@ onMounted(() => {
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold border-b border-slate-200">
-                <th class="p-4 w-20 text-center">Rank</th>
-                <th class="p-4">Player Name</th>
-                <th class="p-4 text-center">Play Time</th>
-                <th class="p-4 text-center">Time Score</th>
-                <th class="p-4 text-center">Question Score</th>
-                <th class="p-4 text-right">Total Score</th>
+              <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold border-b border-slate-200 select-none">
+                <th @click="sortBy('createdAt')" class="p-4 w-32 cursor-pointer hover:bg-slate-100 transition-colors group">
+                  Date
+                  <span v-if="sortKey === 'createdAt'" class="ml-1 text-blue-500">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                </th>
+                <th @click="sortBy('name')" class="p-4 cursor-pointer hover:bg-slate-100 transition-colors">
+                  Player Name
+                  <span v-if="sortKey === 'name'" class="ml-1 text-blue-500">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                </th>
+                <th @click="sortBy('time')" class="p-4 text-center cursor-pointer hover:bg-slate-100 transition-colors">
+                  Play Time
+                  <span v-if="sortKey === 'time'" class="ml-1 text-blue-500">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                </th>
+                <th @click="sortBy('timeScore')" class="p-4 text-center cursor-pointer hover:bg-slate-100 transition-colors">
+                  Time Score
+                  <span v-if="sortKey === 'timeScore'" class="ml-1 text-blue-500">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                </th>
+                <th @click="sortBy('questionScore')" class="p-4 text-center cursor-pointer hover:bg-slate-100 transition-colors">
+                  Question Score
+                  <span v-if="sortKey === 'questionScore'" class="ml-1 text-blue-500">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                </th>
+                <th @click="sortBy('totalScore')" class="p-4 text-right cursor-pointer hover:bg-slate-100 transition-colors">
+                  Total Score
+                  <span v-if="sortKey === 'totalScore'" class="ml-1 text-blue-500">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
+                </th>
                 <th class="p-4 text-center w-24">Action</th>
               </tr>
             </thead>
@@ -135,11 +190,8 @@ onMounted(() => {
                 :key="player.id"
                 class="hover:bg-slate-50 transition-colors group"
               >
-                <td class="p-4 text-center font-mono font-bold text-slate-400">
-                  <span v-if="index === 0" class="text-2xl">🥇</span>
-                  <span v-else-if="index === 1" class="text-2xl">🥈</span>
-                  <span v-else-if="index === 2" class="text-2xl">🥉</span>
-                  <span v-else>#{{ index + 1 }}</span>
+                <td class="p-4 text-sm text-slate-500 font-mono">
+                  {{ formatDate(player.createdAt) }}
                 </td>
                 <td class="p-4 font-bold text-slate-700 text-lg group-hover:text-blue-700 transition-colors">
                   {{ player.name }}

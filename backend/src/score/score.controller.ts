@@ -5,7 +5,7 @@ import { UpdateScoreDto } from './dto/update-score.dto';
 
 @Controller('score')
 export class ScoreController {
-  constructor(private readonly scoreService: ScoreService) {}
+  constructor(private readonly scoreService: ScoreService) { }
 
   @Post()
   create(@Body() createScoreDto: CreateScoreDto) {
