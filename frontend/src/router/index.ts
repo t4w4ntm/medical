@@ -27,7 +27,7 @@ const router = createRouter({
     },
     {
       path: '/',
-      redirect: '/leaderboard' // Default to leaderboard for public
+      redirect: '/login' // Default to login page
     }
   ],
 })
