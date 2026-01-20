@@ -4,12 +4,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScoreModule } from './score/score.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AdminModule } from './admin/admin.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
     // 1. เพิ่ม ConfigModule ให้มันอ่านไฟล์ .env ได้
-    ConfigModule.forRoot(), 
-    
+    ConfigModule.forRoot(),
+
     // 2. แก้ TypeOrmModule ให้ดึงค่าจาก env
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -22,8 +24,10 @@ import { AppService } from './app.service';
       autoLoadEntities: true,
     }),
     ScoreModule,
+    AdminModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

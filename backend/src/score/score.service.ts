@@ -27,7 +27,13 @@ export class ScoreService {
   }
 
   // (ส่วนอื่นที่ไม่ได้ใช้ ลบออกหรือปล่อยไว้ก็ได้ครับ)
-  findOne(id: number) { return `This action returns a #${id} score`; }
+  // ฟังก์ชันดึงคะแนนรายบุคคล พร้อมรายละเอียด
+  findOne(id: number) {
+    return this.scoreRepository.findOne({
+      where: { id },
+      relations: ['details'], // join ตาราง choice_results ออกมาด้วย
+    });
+  }
   update(id: number, updateScoreDto: any) { return `This action updates a #${id} score`; }
   remove(id: number) { return `This action removes a #${id} score`; }
 }
