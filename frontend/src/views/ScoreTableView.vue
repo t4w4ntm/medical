@@ -103,7 +103,7 @@ onMounted(() => {
               v-model="searchTerm"
               type="text" 
               placeholder="Search player..." 
-              class="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm w-full md:w-64"
+              class="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm w-full md:w-64"
             />
             <svg class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
           </div>
@@ -141,7 +141,7 @@ onMounted(() => {
                   <span v-else-if="index === 2" class="text-2xl">🥉</span>
                   <span v-else>#{{ index + 1 }}</span>
                 </td>
-                <td class="p-4 font-bold text-slate-700 text-lg group-hover:text-emerald-700 transition-colors">
+                <td class="p-4 font-bold text-slate-700 text-lg group-hover:text-blue-700 transition-colors">
                   {{ player.name }}
                 </td>
                 <td class="p-4 text-center font-mono text-slate-600">
@@ -153,13 +153,13 @@ onMounted(() => {
                 <td class="p-4 text-center text-slate-600">
                   {{ player.questionScore.toLocaleString() }}
                 </td>
-                <td class="p-4 text-right font-bold font-mono text-emerald-600 text-lg">
+                <td class="p-4 text-right font-bold font-mono text-blue-600 text-lg">
                   {{ player.totalScore.toLocaleString() }}
                 </td>
                 <td class="p-4 text-center">
                   <button 
                     @click="openModal(player)"
-                    class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                    class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                   >
                     View
                   </button>
@@ -189,7 +189,7 @@ onMounted(() => {
           <div class="bg-slate-50 p-6 border-b border-slate-100 flex justify-between items-center">
             <div>
               <h2 class="text-xl font-bold text-slate-800">Session Details</h2>
-              <p class="text-slate-500 text-sm" v-if="selectedPlayer">Player: <span class="font-bold text-emerald-600">{{ selectedPlayer.name }}</span> (ID: {{selectedPlayer.id}})</p>
+              <p class="text-slate-500 text-sm" v-if="selectedPlayer">Player: <span class="font-bold text-blue-600">{{ selectedPlayer.name }}</span> (ID: {{selectedPlayer.id}})</p>
             </div>
             <button @click="closeModal" class="text-slate-400 hover:text-slate-600">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -210,11 +210,11 @@ onMounted(() => {
                   v-for="(detail, i) in selectedPlayer.details" 
                   :key="detail.id"
                   class="border rounded-xl p-4 flex items-start gap-4 transition-all hover:bg-slate-50"
-                  :class="detail.isCorrect ? 'border-emerald-200 bg-emerald-50/10' : 'border-red-200 bg-red-50/10'"
+                  :class="detail.isCorrect ? 'border-blue-200 bg-blue-50/10' : 'border-red-200 bg-red-50/10'"
                 >
                   <!-- Status Icon -->
                   <div class="mt-1">
-                    <div v-if="detail.isCorrect" class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
+                    <div v-if="detail.isCorrect" class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                     </div>
                     <div v-else class="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
@@ -228,7 +228,7 @@ onMounted(() => {
                        <span class="font-mono text-xs text-slate-400">ID: {{ detail.choiceId }}</span>
                        <span 
                          class="text-xs font-bold px-2 py-0.5 rounded uppercase"
-                         :class="detail.isCorrect ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'"
+                         :class="detail.isCorrect ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'"
                        >
                          {{ detail.isCorrect ? 'Correct' : 'Incorrect' }}
                        </span>
