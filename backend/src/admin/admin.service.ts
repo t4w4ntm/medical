@@ -35,4 +35,19 @@ export class AdminService implements OnModuleInit {
     async findOne(username: string): Promise<Admin | null> {
         return this.adminRepository.findOne({ where: { username } });
     }
+
+    async create(createAdminDto: any): Promise<Admin> {
+        const hashedPassword = await bcrypt.hash(createAdminDto.password, 10);
+        const admin = this.adminRepository.create({
+            username: createAdminDto.username,
+            password: hashedPassword,
+        });
+        return this.adminRepository.save(admin);
+    }
+
+    async findAll(): Promise<Admin[]> {
+        return this.adminRepository.find({
+            select: ['id', 'username'] // Don't return password
+        });
+    }
 }
