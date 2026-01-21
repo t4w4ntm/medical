@@ -1,6 +1,6 @@
-
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AdminService } from '../admin/admin.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -8,7 +8,7 @@ export class AuthService {
 
     async validateUser(username: string, pass: string): Promise<any> {
         const user = await this.adminService.findOne(username);
-        if (user && user.password === pass) {
+        if (user && await bcrypt.compare(pass, user.password)) {
             const { password, ...result } = user;
             return result;
         }

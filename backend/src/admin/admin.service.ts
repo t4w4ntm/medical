@@ -3,6 +3,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Admin } from './entities/admin.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AdminService implements OnModuleInit {
@@ -12,14 +13,22 @@ export class AdminService implements OnModuleInit {
     ) { }
 
     async onModuleInit() {
-        // Seed default admin if not exists
-        const admin = await this.adminRepository.findOne({ where: { username: 'admin' } });
+        const username = 'admin2';
+        const hashedPassword = await bcrypt.hash('admin1234', 10);
+
+        const admin = await this.adminRepository.findOne({ where: { username } });
+
         if (!admin) {
             await this.adminRepository.save({
-                username: 'admin',
-                password: 'admin1234', // Default password
+                username,
+                password: hashedPassword,
             });
             console.log('Default admin created: admin / admin1234');
+        } else {
+            // Force update password to hashed version (in case it was plain text)
+            admin.password = hashedPassword;
+            await this.adminRepository.save(admin);
+            console.log('Default admin password updated to hashed version');
         }
     }
 
