@@ -270,44 +270,45 @@ onMounted(() => {
             <div v-else-if="selectedPlayer && selectedPlayer.details && selectedPlayer.details.length > 0">
               <h3 class="text-sm font-bold uppercase text-slate-400 tracking-wider mb-4">Question Analysis</h3>
               
-              <div class="grid gap-4">
+              <div class="flex flex-col">
                 <div 
                   v-for="(detail, i) in selectedPlayer.details" 
                   :key="detail.id"
-                  class="border rounded-xl p-4 flex items-start gap-4 transition-all hover:bg-slate-50"
-                  :class="detail.isCorrect ? 'border-blue-200 bg-blue-50/10' : 'border-red-200 bg-red-50/10'"
+                  class="group flex items-start gap-4 p-4 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-all rounded-lg"
                 >
-                  <!-- Status Icon -->
-                  <div class="mt-1">
-                    <div v-if="detail.isCorrect" class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                  <!-- Sequence/Index for visual list feeling -->
+                  <div class="mt-1 font-mono text-xs text-slate-300 w-6 text-right pt-2">{{ i + 1 }}.</div>
+
+                  <!-- Status Icon (Smaller & Sleeker) -->
+                  <div class="mt-1 shrink-0">
+                    <div v-if="detail.isCorrect" class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center shadow-sm shadow-blue-200">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                     </div>
-                    <div v-else class="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
+                    <div v-else class="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center shadow-sm shadow-red-200">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </div>
                   </div>
                   
                   <!-- Info -->
-                  <div class="flex-1">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
-                       <span class="font-mono text-xs text-slate-400">ID: {{ detail.choiceId }}</span>
+                  <div class="flex-1 min-w-0"> <!-- min-w-0 for text truncation to work if needed -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-1">
+                       <h4 class="font-bold text-slate-800 text-lg leading-snug">{{ detail.choiceText }}</h4>
                        <span 
-                         class="text-xs font-bold px-2 py-0.5 rounded uppercase"
-                         :class="detail.isCorrect ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'"
+                         class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 w-fit"
+                         :class="detail.isCorrect ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-red-50 text-red-600 border border-red-100'"
                        >
                          {{ detail.isCorrect ? 'Correct' : 'Incorrect' }}
                        </span>
                     </div>
                     
-                    <p class="font-medium text-slate-800 text-lg mb-1">{{ detail.choiceText }}</p>
-                    
-                    <div class="flex items-center gap-4 text-sm text-slate-500 mt-2">
+                    <div class="flex items-center gap-4 text-xs text-slate-400 mt-1">
+                       <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-500">ID: {{ detail.choiceId }}</span>
                        <span class="flex items-center gap-1">
-                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                         Clicked: {{ detail.wasClicked ? 'Yes' : 'No' }}
+                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                         Selected: {{ detail.wasClicked ? 'Yes' : 'No' }}
                        </span>
                        <span class="flex items-center gap-1" v-if="detail.attemptNo > 0">
-                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                          Attempt: {{ detail.attemptNo }}
                        </span>
                     </div>
