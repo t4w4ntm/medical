@@ -45,7 +45,14 @@ export class ScoreService {
     });
   }
   update(id: number, updateScoreDto: any) { return `This action updates a #${id} score`; }
-  remove(id: number) {
-    return this.scoreRepository.delete(id);
+  async remove(id: number) {
+    const score = await this.scoreRepository.findOne({
+      where: { id },
+      relations: ['details']
+    });
+
+    if (score) {
+      return this.scoreRepository.remove(score);
+    }
   }
 }
