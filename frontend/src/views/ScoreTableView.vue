@@ -448,6 +448,39 @@ onMounted(() => {
         </div>
       </div>
     </Transition>
+
+    <!-- Delete Confirmation Modal -->
+    <Transition name="fade">
+      <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="closeDeleteModal"></div>
+        
+        <div class="relative bg-white rounded-xl shadow-xl max-w-sm w-full p-6 text-center">
+          <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          </div>
+          
+          <h3 class="text-lg font-bold text-slate-800 mb-2">Delete Score?</h3>
+          <p class="text-slate-500 text-sm mb-6">Are you sure you want to delete <span class="font-bold text-slate-800">{{ scoreToDelete?.name }}</span>'s score? This action cannot be undone.</p>
+          
+          <div class="flex gap-3 justify-center">
+            <button 
+              @click="closeDeleteModal" 
+              class="px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 font-bold text-sm transition-colors"
+            >
+              Cancel
+            </button>
+            <button 
+              @click="deleteScore" 
+              :disabled="deleting"
+              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold text-sm shadow-sm shadow-red-200 transition-colors disabled:opacity-50 flex items-center gap-2"
+            >
+              <span v-if="deleting">Deleting...</span>
+              <span v-else>Confirm Delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
