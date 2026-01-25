@@ -17,13 +17,23 @@ export class ScoreService {
   }
 
   // ฟังก์ชันดึงคะแนนทั้งหมด (เรียงจากมากไปน้อย)
-  findAll() {
-    return this.scoreRepository.find({
+  async findAll(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.scoreRepository.findAndCount({
       order: {
         totalScore: 'DESC', // เรียงคะแนนรวมมากสุดขึ้นก่อน (Leaderboard)
       },
-      take: 10, // (Optional) ดึงแค่ 10 อันดับแรก
+      skip: skip,
+      take: limit,
     });
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
   }
 
   // (ส่วนอื่นที่ไม่ได้ใช้ ลบออกหรือปล่อยไว้ก็ได้ครับ)
@@ -35,5 +45,7 @@ export class ScoreService {
     });
   }
   update(id: number, updateScoreDto: any) { return `This action updates a #${id} score`; }
-  remove(id: number) { return `This action removes a #${id} score`; }
+  remove(id: number) {
+    return this.scoreRepository.delete(id);
+  }
 }

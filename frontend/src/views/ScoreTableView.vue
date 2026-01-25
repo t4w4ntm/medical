@@ -27,7 +27,14 @@ const currentUser = ref<any>(null)
 
 const scores = ref<Score[]>([])
 const loading = ref(true)
+
 const searchTerm = ref('')
+
+// Pagination
+const currentPage = ref(1)
+const totalPages = ref(1)
+const limit = ref(10)
+const totalItems = ref(0)
 
 const handleLogout = () => {
   localStorage.removeItem('isAuthenticated')
@@ -63,6 +70,11 @@ const showModal = ref(false)
 const selectedPlayer = ref<Score | null>(null)
 const loadingDetails = ref(false)
 
+// Delete Modal
+const showDeleteModal = ref(false)
+const scoreToDelete = ref<Score | null>(null)
+const deleting = ref(false)
+
 // Format time
 const formatTime = (seconds: number): string => {
   const mins = Math.floor(seconds / 60)
@@ -70,18 +82,37 @@ const formatTime = (seconds: number): string => {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
 }
 
-const fetchScores = async () => {
+const fetchScores = async (page = 1) => {
+  loading.value = true
+  // Reset sorting when fetching new page to avoid confusion, or handle sort + pagination backend side (ideal). 
+  // For now, let's keep client side sort for the page.
+  
   try {
     const apiUrl = import.meta.env.VITE_API_URL || 'https://medical-production-396d.up.railway.app'
-    const res = await fetch(`${apiUrl}/score`)
+    const res = await fetch(`${apiUrl}/score?page=${page}&limit=${limit.value}`)
     const data = await res.json()
-    // Sort by Total Score DESC
-    scores.value = data.sort((a: Score, b: Score) => b.totalScore - a.totalScore)
+    
+    // Backend now returns { data: [], total: number, page: number, limit: number }
+    if (data.data) {
+        scores.value = data.data
+        totalItems.value = data.total
+        currentPage.value = page
+        totalPages.value = Math.ceil(data.total / limit.value)
+    } else {
+        // Fallback if backend not updated yet
+        scores.value = data
+    }
+    
     loading.value = false
   } catch (error) {
     console.error('Error fetching scores:', error)
     loading.value = false
   }
+}
+
+const changePage = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages.value) return
+    fetchScores(newPage)
 }
 
 const fetchPlayerDetails = async (id: number) => {
@@ -111,6 +142,40 @@ const closeModal = () => {
   selectedPlayer.value = null
 }
 
+const confirmDelete = (score: Score) => {
+  scoreToDelete.value = score
+  showDeleteModal.value = true
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  scoreToDelete.value = null
+}
+
+const deleteScore = async () => {
+  if (!scoreToDelete.value) return
+  
+  deleting.value = true
+  try {
+    const apiUrl = import.meta.env.VITE_API_URL || 'https://medical-production-396d.up.railway.app'
+    const res = await fetch(`${apiUrl}/score/${scoreToDelete.value.id}`, {
+      method: 'DELETE'
+    })
+    
+    if (res.ok) {
+      // Remove locally
+      scores.value = scores.value.filter(s => s.id !== scoreToDelete.value?.id)
+      closeDeleteModal()
+    } else {
+      console.error('Failed to delete score')
+    }
+  } catch (error) {
+    console.error('Error deleting score:', error)
+  } finally {
+    deleting.value = false
+  }
+}
+
 const filteredScores = computed(() => {
   let result = scores.value.filter(s => 
     s.name.toLowerCase().includes(searchTerm.value.toLowerCase())
@@ -135,7 +200,7 @@ onMounted(() => {
   if (userStr) {
     currentUser.value = JSON.parse(userStr)
   }
-  fetchScores()
+  fetchScores(1)
 })
 </script>
 
@@ -165,8 +230,27 @@ onMounted(() => {
              Manage Users
           </button>
           
-          <button @click="fetchScores" class="p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-sm text-slate-600 transition-colors" title="Refresh">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          
+          <div class="flex items-center bg-white border border-slate-200 rounded-lg p-1 mr-2 shadow-sm">
+             <button 
+                @click="changePage(currentPage - 1)" 
+                :disabled="currentPage === 1"
+                class="p-1.5 rounded-md hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-slate-600"
+             >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+             </button>
+             <span class="px-3 text-sm font-bold text-slate-600 font-mono">{{ currentPage }} / {{ totalPages }}</span>
+             <button 
+                @click="changePage(currentPage + 1)" 
+                :disabled="currentPage === totalPages"
+                class="p-1.5 rounded-md hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-slate-600"
+             >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+             </button>
+          </div>
+
+          <button @click="fetchScores(currentPage)" class="p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-sm text-slate-600 transition-colors" title="Refresh">
+             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
           </button>
           
           <button @click="handleLogout" class="p-2 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg shadow-sm text-red-600 transition-colors" title="Logout">
@@ -235,9 +319,15 @@ onMounted(() => {
                 <td class="p-4 text-center">
                   <button 
                     @click="openModal(player)"
-                    class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                    class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors mr-2"
                   >
                     View
+                  </button>
+                  <button 
+                    @click="confirmDelete(player)"
+                    class="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                   </button>
                 </td>
               </tr>

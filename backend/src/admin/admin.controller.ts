@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 
 @Controller('admin')
@@ -13,5 +13,10 @@ export class AdminController {
     @Get()
     findAll() {
         return this.adminService.findAll();
+    }
+
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.adminService.remove(+id);
     }
 }

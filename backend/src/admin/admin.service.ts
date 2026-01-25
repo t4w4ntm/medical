@@ -50,4 +50,7 @@ export class AdminService implements OnModuleInit {
             select: ['id', 'username'] // Don't return password
         });
     }
+    async remove(id: number): Promise<void> {
+        await this.adminRepository.delete(id);
+    }
 }

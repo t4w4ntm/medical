@@ -19,6 +19,11 @@ const showPassword = ref(false)
 const creating = ref(false)
 const errorMsg = ref('')
 
+// Delete Modal
+const showDeleteModal = ref(false)
+const adminToDelete = ref<AdminUser | null>(null)
+const deleting = ref(false)
+
 const fetchAdmins = async () => {
   loading.value = true
   try {
@@ -77,6 +82,39 @@ const closeModal = () => {
     errorMsg.value = ''
 }
 
+const confirmDelete = (admin: AdminUser) => {
+    adminToDelete.value = admin
+    showDeleteModal.value = true
+}
+
+const closeDeleteModal = () => {
+    showDeleteModal.value = false
+    adminToDelete.value = null
+}
+
+const deleteAdmin = async () => {
+    if (!adminToDelete.value) return
+
+    deleting.value = true
+    try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://medical-production-396d.up.railway.app'
+        const res = await fetch(`${apiUrl}/admin/${adminToDelete.value.id}`, {
+            method: 'DELETE'
+        })
+
+        if (res.ok) {
+            admins.value = admins.value.filter(a => a.id !== adminToDelete.value?.id)
+            closeDeleteModal()
+        } else {
+            console.error('Failed to delete admin')
+        }
+    } catch (error) {
+        console.error('Error deleting admin:', error)
+    } finally {
+        deleting.value = false
+    }
+}
+
 const goBack = () => {
     router.push('/table')
 }
@@ -125,7 +163,14 @@ onMounted(() => {
                         <p class="text-xs text-slate-400 font-mono">ID: {{ admin.id }}</p>
                     </div>
                 </div>
-                <!-- Future: Add Delete Button -->
+                <!-- Delete Button -->
+                <button 
+                    @click="confirmDelete(admin)"
+                    class="p-2 text-slate-400 hover:text-red-500 bg-transparent hover:bg-red-50 rounded-lg transition-all"
+                    title="Delete Admin"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
             </div>
          </div>
       </div>
@@ -166,6 +211,32 @@ onMounted(() => {
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="closeDeleteModal"></div>
+        <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform transition-all">
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Delete Admin?</h3>
+                <p class="text-slate-500 text-sm mt-2">Are you sure you want to delete <span class="font-bold text-slate-800">{{ adminToDelete?.username }}</span>? This action cannot be undone.</p>
+            </div>
+            
+            <div class="flex gap-3">
+                <button @click="closeDeleteModal" class="flex-1 py-2.5 text-slate-500 hover:text-slate-700 font-bold transition-colors bg-slate-100 hover:bg-slate-200 rounded-xl">Cancel</button>
+                <button 
+                    @click="deleteAdmin" 
+                    :disabled="deleting"
+                    class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl shadow-lg shadow-red-500/30 transition-all flex items-center justify-center gap-2"
+                >
+                    <span v-if="deleting">Deleting...</span>
+                    <span v-else>Delete</span>
+                </button>
+            </div>
         </div>
     </div>
   </div>
