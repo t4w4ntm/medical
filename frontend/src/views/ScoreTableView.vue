@@ -75,7 +75,11 @@ const showDeleteModal = ref(false)
 const scoreToDelete = ref<Score | null>(null)
 const deleting = ref(false)
 
-// Format time
+// Delete Modal
+const showDeleteModal = ref(false)
+const scoreToDelete = ref<Score | null>(null)
+const deleting = ref(false)
+const isDeleteMode = ref(false) // Toggle for delete mode
 const formatTime = (seconds: number): string => {
   const mins = Math.floor(seconds / 60)
   const secs = seconds % 60
@@ -249,8 +253,17 @@ onMounted(() => {
              </button>
           </div>
 
-          <button @click="fetchScores(currentPage)" class="p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-sm text-slate-600 transition-colors" title="Refresh">
+          <button @click="fetchScores(currentPage)" class="p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-sm text-slate-600 transition-colors mr-2" title="Refresh">
              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          </button>
+
+           <button 
+            @click="isDeleteMode = !isDeleteMode" 
+            class="p-2 mr-2 border rounded-lg shadow-sm transition-colors"
+            :class="isDeleteMode ? 'bg-red-100 text-red-600 border-red-200' : 'bg-white hover:bg-slate-50 text-slate-400 border-slate-200'"
+            title="Toggle Delete Mode"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
           </button>
           
           <button @click="handleLogout" class="p-2 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg shadow-sm text-red-600 transition-colors" title="Logout">
@@ -317,19 +330,21 @@ onMounted(() => {
                   {{ player.totalScore.toLocaleString() }}
                 </td>
                 <td class="p-4 text-center">
-                  <div class="flex flex-col items-center gap-2">
+                <td class="p-4 text-center">
+                  <div class="flex justify-center">
                     <button 
+                      v-if="!isDeleteMode"
                       @click="openModal(player)"
-                      class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1 rounded-lg text-xs font-bold transition-colors w-16"
+                      class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-4 py-1.5 rounded-lg text-sm font-bold transition-colors"
                     >
                       View
                     </button>
-                    <button 
-                      @click="confirmDelete(player)"
-                      class="bg-red-50 text-red-600 hover:bg-red-100 p-1.5 rounded-lg text-sm font-bold transition-colors"
-                      title="Delete"
+                     <button 
+                      v-else
+                      @click.stop="confirmDelete(player)"
+                      class="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-1.5 rounded-lg text-sm font-bold transition-colors"
                     >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                      Delete
                     </button>
                   </div>
                 </td>
