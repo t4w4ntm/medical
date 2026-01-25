@@ -76,9 +76,6 @@ const scoreToDelete = ref<Score | null>(null)
 const deleting = ref(false)
 
 // Delete Modal
-const showDeleteModal = ref(false)
-const scoreToDelete = ref<Score | null>(null)
-const deleting = ref(false)
 const isDeleteMode = ref(false) // Toggle for delete mode
 const formatTime = (seconds: number): string => {
   const mins = Math.floor(seconds / 60)
@@ -329,7 +326,6 @@ onMounted(() => {
                 <td class="p-4 text-right font-bold font-mono text-blue-600 text-lg">
                   {{ player.totalScore.toLocaleString() }}
                 </td>
-                <td class="p-4 text-center">
                 <td class="p-4 text-center">
                   <div class="flex justify-center">
                     <button 
