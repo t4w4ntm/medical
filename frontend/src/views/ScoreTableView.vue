@@ -214,25 +214,43 @@ onMounted(() => {
           <p class="text-slate-500 text-sm mt-1">Full detailed history of all game sessions</p>
         </div>
         
-        <div class="flex items-center gap-4">
-          <div class="relative">
-            <input 
-              v-model="searchTerm"
-              type="text" 
-              placeholder="Search player..." 
-              class="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm w-full md:w-64"
-            />
-            <svg class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <div class="flex flex-col items-end gap-3">
+          <div class="flex items-center gap-2">
+            <div class="relative">
+              <input 
+                v-model="searchTerm"
+                type="text" 
+                placeholder="Search player..." 
+                class="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm w-full md:w-64"
+              />
+              <svg class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+
+            <button @click="router.push('/admin-manage')" class="px-3 py-2 bg-slate-800 text-white rounded-lg shadow-sm font-bold text-sm hover:bg-slate-700 transition-colors flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+              Manage Users
+            </button>
+            
+            <button @click="fetchScores(currentPage)" class="p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-sm text-slate-600 transition-colors" title="Refresh">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            </button>
+
+            <button 
+              @click="isDeleteMode = !isDeleteMode" 
+              class="p-2 border rounded-lg shadow-sm transition-colors"
+              :class="isDeleteMode ? 'bg-red-100 text-red-600 border-red-200' : 'bg-white hover:bg-slate-50 text-slate-400 border-slate-200'"
+              title="Toggle Delete Mode"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+            
+            <button @click="handleLogout" class="p-2 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg shadow-sm text-red-600 transition-colors" title="Logout">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+            </button>
           </div>
 
-
-          <button @click="router.push('/admin-manage')" class="mr-2 px-3 py-2 bg-slate-800 text-white rounded-lg shadow-sm font-bold text-sm hover:bg-slate-700 transition-colors flex items-center gap-2">
-             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-             Manage Users
-          </button>
-          
-          
-          <div class="flex items-center bg-white border border-slate-200 rounded-lg p-1 mr-2 shadow-sm">
+          <!-- Pagination Row -->
+          <div class="flex items-center gap-2">
              <button 
                 @click="changePage(currentPage - 1)" 
                 :disabled="currentPage === 1"
@@ -240,7 +258,7 @@ onMounted(() => {
              >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
              </button>
-             <span class="px-3 text-sm font-bold text-slate-600 font-mono">{{ currentPage }} / {{ totalPages }}</span>
+             <span class="text-xs font-bold text-slate-400 font-mono">{{ currentPage }} / {{ totalPages }}</span>
              <button 
                 @click="changePage(currentPage + 1)" 
                 :disabled="currentPage === totalPages"
@@ -249,23 +267,6 @@ onMounted(() => {
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
              </button>
           </div>
-
-          <button @click="fetchScores(currentPage)" class="p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-sm text-slate-600 transition-colors mr-2" title="Refresh">
-             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-          </button>
-
-           <button 
-            @click="isDeleteMode = !isDeleteMode" 
-            class="p-2 mr-2 border rounded-lg shadow-sm transition-colors"
-            :class="isDeleteMode ? 'bg-red-100 text-red-600 border-red-200' : 'bg-white hover:bg-slate-50 text-slate-400 border-slate-200'"
-            title="Toggle Delete Mode"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-          </button>
-          
-          <button @click="handleLogout" class="p-2 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg shadow-sm text-red-600 transition-colors" title="Logout">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-          </button>
         </div>
       </header>
 
