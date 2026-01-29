@@ -153,7 +153,7 @@ onMounted(() => {
                     </div>
                     <div>
                         <h3 class="font-bold text-slate-800 text-lg">{{ admin.username }}</h3>
-                        <p class="text-xs text-slate-400 font-mono">ID: {{ admin.id }}</p>
+                        <!-- <p class="text-xs text-slate-400 font-mono">ID: {{ admin.id }}</p> -->
                     </div>
                 </div>
                 <!-- Delete Button -->

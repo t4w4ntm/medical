@@ -82,7 +82,7 @@ onUnmounted(() => {
             </div>
             <div class="flex-1 min-w-0">
                <p class="text-sm font-bold text-white truncate">{{ currentUser?.username || 'Admin' }}</p>
-               <p class="text-xs text-slate-400 truncate">ID: {{ currentUser?.id || '-' }}</p>
+               <p class="text-xs text-slate-400 truncate">{{ currentUser?.username ? 'Administrator' : 'System' }}</p>
             </div>
             <svg class="w-4 h-4 text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': showProfileMenu }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
          </button>
