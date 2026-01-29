@@ -10,6 +10,12 @@ const router = createRouter({
       component: () => import('../views/LoginView.vue'),
     },
     {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import('../views/DashboardView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/table',
       name: 'table',
       component: () => import('../views/ScoreTableView.vue'),
@@ -43,6 +49,8 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.requiresAuth && !isAuthenticated) {
     next('/login')
+  } else if (to.path === '/login' && isAuthenticated) {
+    next('/dashboard')
   } else {
     next()
   }

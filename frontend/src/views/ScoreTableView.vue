@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import DashboardLayout from '../layouts/DashboardLayout.vue'
 
 interface ScoreDetail {
   id: number
@@ -19,7 +20,7 @@ interface Score {
   questionScore: number
   totalScore: number
   createdAt: string
-  details?: ScoreDetail[] // Optional because it might not be loaded in list view unless we fetch it
+  details?: ScoreDetail[] 
 }
 
 const router = useRouter()
@@ -35,12 +36,7 @@ const currentPage = ref(1)
 const totalPages = ref(1)
 const limit = ref(10)
 const totalItems = ref(0)
-
-const handleLogout = () => {
-  localStorage.removeItem('isAuthenticated')
-  localStorage.removeItem('user')
-  router.push('/login')
-}
+// Removed handleLogout as it is in Sidebar now
 
 // Sorting
 type SortKey = 'createdAt' | 'name' | 'time' | 'timeScore' | 'questionScore' | 'totalScore'
@@ -52,7 +48,7 @@ const sortBy = (key: SortKey) => {
     sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
   } else {
     sortKey.value = key
-    sortOrder.value = 'desc' // Default to desc for numbers usually
+    sortOrder.value = 'desc' 
   }
 }
 
@@ -85,22 +81,18 @@ const formatTime = (seconds: number): string => {
 
 const fetchScores = async (page = 1) => {
   loading.value = true
-  // Reset sorting when fetching new page to avoid confusion, or handle sort + pagination backend side (ideal). 
-  // For now, let's keep client side sort for the page.
   
   try {
     const apiUrl = import.meta.env.VITE_API_URL || 'https://medical-production-396d.up.railway.app'
     const res = await fetch(`${apiUrl}/score?page=${page}&limit=${limit.value}`)
     const data = await res.json()
     
-    // Backend now returns { data: [], total: number, page: number, limit: number }
     if (data.data) {
         scores.value = data.data
         totalItems.value = data.total
         currentPage.value = page
         totalPages.value = Math.ceil(data.total / limit.value)
     } else {
-        // Fallback if backend not updated yet
         scores.value = data
     }
     
@@ -132,9 +124,6 @@ const fetchPlayerDetails = async (id: number) => {
 
 const openModal = async (player: Score) => {
   showModal.value = true
-  // Check if details are already loaded (if API returns them in list, good, but likely we need to fetch individually for full details if list is light)
-  // For now, based on my previous backend `findAll`, it returns basic info. `findOne` returns details.
-  // So I should fetch details here.
   await fetchPlayerDetails(player.id)
 }
 
@@ -164,7 +153,6 @@ const deleteScore = async () => {
     })
     
     if (res.ok) {
-      // Remove locally
       scores.value = scores.value.filter(s => s.id !== scoreToDelete.value?.id)
       closeDeleteModal()
     } else {
@@ -190,7 +178,6 @@ const filteredScores = computed(() => {
     } else if (sortKey.value === 'createdAt') {
       return (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) * modifier
     } else {
-      // Numbers
       return (a[sortKey.value] - b[sortKey.value]) * modifier
     }
   })
@@ -206,31 +193,26 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 p-6 md:p-10">
+  <DashboardLayout>
     <div class="max-w-7xl mx-auto">
       <header class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <h1 class="text-3xl font-black text-slate-800 tracking-tight">Game Scoreboard</h1>
-          <p class="text-slate-500 text-sm mt-1">Full detailed history of all game sessions</p>
+           <!-- Removed description to look cleaner like design -->
         </div>
         
         <div class="flex flex-col items-end gap-3">
           <div class="flex items-center gap-2">
-            <div class="relative">
+            <div class="relative bg-white rounded-full shadow-sm border border-slate-200">
               <input 
                 v-model="searchTerm"
                 type="text" 
-                placeholder="Search player..." 
-                class="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm w-full md:w-64"
+                placeholder="Search Student ID..." 
+                class="pl-10 pr-4 py-2 bg-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64 text-sm"
               />
-              <svg class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
 
-            <button @click="router.push('/admin-manage')" class="px-3 py-2 bg-slate-800 text-white rounded-lg shadow-sm font-bold text-sm hover:bg-slate-700 transition-colors flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-              Manage Users
-            </button>
-            
             <button @click="fetchScores(currentPage)" class="p-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-sm text-slate-600 transition-colors" title="Refresh">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
             </button>
@@ -243,10 +225,6 @@ onMounted(() => {
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             </button>
-            
-            <button @click="handleLogout" class="p-2 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg shadow-sm text-red-600 transition-colors" title="Logout">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-            </button>
           </div>
 
           <!-- Pagination Row -->
@@ -254,17 +232,17 @@ onMounted(() => {
              <button 
                 @click="changePage(currentPage - 1)" 
                 :disabled="currentPage === 1"
-                class="p-1.5 rounded-md hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-slate-600"
+                class="p-1.5 hover:text-blue-600 disabled:opacity-30 transition-colors text-slate-400"
              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
              </button>
              <span class="text-xs font-bold text-slate-400 font-mono">{{ currentPage }} / {{ totalPages }}</span>
              <button 
                 @click="changePage(currentPage + 1)" 
                 :disabled="currentPage === totalPages"
-                class="p-1.5 rounded-md hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-slate-600"
+                class="p-1.5 hover:text-blue-600 disabled:opacity-30 transition-colors text-slate-400"
              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
              </button>
           </div>
         </div>
@@ -482,7 +460,7 @@ onMounted(() => {
         </div>
       </div>
     </Transition>
-  </div>
+  </DashboardLayout>
 </template>
 
 <style scoped>

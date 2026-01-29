@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import DashboardLayout from '../layouts/DashboardLayout.vue'
 
 interface AdminUser {
   id: number
@@ -115,25 +116,17 @@ const deleteAdmin = async () => {
     }
 }
 
-const goBack = () => {
-    router.push('/table')
-}
-
 onMounted(() => {
   fetchAdmins()
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 p-6 md:p-10">
+  <DashboardLayout>
     <div class="max-w-4xl mx-auto">
       <!-- Header -->
       <div class="flex items-center justify-between mb-8">
         <div>
-           <button @click="goBack" class="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-2 transition-colors">
-             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-             Back to Score Table
-           </button>
            <h1 class="text-3xl font-black text-slate-800 tracking-tight">Admin Management</h1>
            <p class="text-slate-500 text-sm mt-1">Manage system administrators</p>
         </div>
@@ -239,5 +232,5 @@ onMounted(() => {
             </div>
         </div>
     </div>
-  </div>
+  </DashboardLayout>
 </template>
