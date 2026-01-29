@@ -55,4 +55,27 @@ export class ScoreService {
       return this.scoreRepository.remove(score);
     }
   }
+
+  async removeBulk(ids: number[], deleteAll: boolean = false) {
+    if (deleteAll) {
+      // Delete All logic: Truncate or delete all
+      // Using delete({}) to trigger cascade if configured, or just clear table
+      // To ensure relations are handled, we might need to find all. 
+      // But for performance, if we have many records, DELETE FROM is better.
+      // Since specific requirement is "delete all", we can use .clear() or .delete({})
+      // But we must respect relations.
+      const scores = await this.scoreRepository.find({ relations: ['details'] });
+      // This is slow if many records. But safe for cascades.
+      return this.scoreRepository.remove(scores);
+    } else {
+      if (!ids || ids.length === 0) return;
+      const scores = await this.scoreRepository
+        .createQueryBuilder("score")
+        .leftJoinAndSelect("score.details", "details")
+        .where("score.id IN (:...ids)", { ids })
+        .getMany();
+
+      return this.scoreRepository.remove(scores);
+    }
+  }
 }

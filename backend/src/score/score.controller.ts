@@ -31,4 +31,9 @@ export class ScoreController {
   remove(@Param('id') id: string) {
     return this.scoreService.remove(+id);
   }
+
+  @Post('bulk-delete')
+  removeBulk(@Body() body: { ids: number[], deleteAll: boolean }) {
+    return this.scoreService.removeBulk(body.ids, body.deleteAll);
+  }
 }

@@ -143,26 +143,107 @@ const closeDeleteModal = () => {
 }
 
 const deleteScore = async () => {
-  if (!scoreToDelete.value) return
-  
-  deleting.value = true
-  try {
-    const apiUrl = import.meta.env.VITE_API_URL || 'https://medical-production-396d.up.railway.app'
-    const res = await fetch(`${apiUrl}/score/${scoreToDelete.value.id}`, {
-      method: 'DELETE'
-    })
-    
-    if (res.ok) {
-      scores.value = scores.value.filter(s => s.id !== scoreToDelete.value?.id)
-      closeDeleteModal()
-    } else {
-      console.error('Failed to delete score')
-    }
-  } catch (error) {
-    console.error('Error deleting score:', error)
-  } finally {
-    deleting.value = false
+  if (scoreToDelete.value) {
+      deleting.value = true
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://medical-production-396d.up.railway.app'
+        const res = await fetch(`${apiUrl}/score/${scoreToDelete.value.id}`, {
+          method: 'DELETE'
+        })
+        
+        if (res.ok) {
+          scores.value = scores.value.filter(s => s.id !== scoreToDelete.value?.id)
+          totalItems.value--
+          closeDeleteModal()
+        } else {
+          console.error('Failed to delete score')
+        }
+      } catch (error) {
+        console.error('Error deleting score:', error)
+      } finally {
+        deleting.value = false
+      }
+  } else if (selectedIds.value.size > 0 || isSelectAllGlobal.value) {
+      deleting.value = true
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://medical-production-396d.up.railway.app'
+        const res = await fetch(`${apiUrl}/score/bulk-delete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                ids: Array.from(selectedIds.value),
+                deleteAll: isSelectAllGlobal.value
+            })
+        })
+
+        if (res.ok) {
+            if (isSelectAllGlobal.value) {
+                scores.value = []
+                totalItems.value = 0
+            } else {
+                scores.value = scores.value.filter(s => !selectedIds.value.has(s.id))
+                totalItems.value -= selectedIds.value.size
+            }
+            selectedIds.value.clear()
+            isSelectAllGlobal.value = false
+            fetchScores(currentPage.value) // Refresh to fill page
+            closeDeleteModal()
+        } else {
+            console.error('Failed to bulk delete')
+        }
+      } catch (error) {
+        console.error('Error bulk deleting:', error)
+      } finally {
+        deleting.value = false
+      }
   }
+}
+
+// Bulk Selection
+const selectedIds = ref<Set<number>>(new Set())
+const isSelectAllGlobal = ref(false)
+
+const toggleSelectAll = () => {
+    isSelectAllGlobal.value = !isSelectAllGlobal.value
+    if (isSelectAllGlobal.value) {
+        // Select logic implies we consider EVERYTHING selected
+        selectedIds.value.clear() // Clear explicit IDs because 'Global' overrides
+    } else {
+        selectedIds.value.clear()
+    }
+}
+
+const toggleSelection = (id: number) => {
+    if (isSelectAllGlobal.value) {
+        // If unchecking while global select is on, we turn off global select 
+        // and ideally should select all OTHER items. 
+        // But since we don't have all IDs, we simplify:
+        // Turn off global, clear everything, and let user select manually (or just warn).
+        // Better UX for this specific prompt: Just turn off global select.
+        isSelectAllGlobal.value = false
+        selectedIds.value.clear()
+        // Ideally we would populate with all visible IDs except this one, but that's just for current page.
+        // Let's select all on current page except this one to be helpful.
+        scores.value.forEach(s => {
+            if (s.id !== id) selectedIds.value.add(s.id)
+        })
+    } else {
+        if (selectedIds.value.has(id)) {
+            selectedIds.value.delete(id)
+        } else {
+            selectedIds.value.add(id)
+        }
+    }
+}
+
+const selectedCount = computed(() => {
+    return isSelectAllGlobal.value ? totalItems.value : selectedIds.value.size
+})
+
+const confirmBulkDelete = () => {
+    if (selectedCount.value === 0) return
+    scoreToDelete.value = null // Ensure single delete mode is off
+    showDeleteModal.value = true
 }
 
 const filteredScores = computed(() => {
@@ -225,6 +306,15 @@ onMounted(() => {
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             </button>
+
+            <button 
+                v-if="isDeleteMode && selectedCount > 0"
+                @click="confirmBulkDelete"
+                class="ml-2 px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg shadow-sm shadow-red-200 hover:bg-red-700 transition-colors flex items-center gap-2"
+            >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                Delete ({{ selectedCount.toLocaleString() }})
+            </button>
           </div>
 
           <!-- Pagination Row -->
@@ -254,6 +344,14 @@ onMounted(() => {
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold border-b border-slate-200 select-none">
+                <th v-if="isDeleteMode" class="p-4 w-12 text-center">
+                    <input 
+                        type="checkbox" 
+                        :checked="isSelectAllGlobal" 
+                        @click="toggleSelectAll"
+                        class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                    />
+                </th>
                 <th @click="sortBy('createdAt')" class="p-4 w-32 cursor-pointer hover:bg-slate-100 transition-colors group">
                   Date
                   <span v-if="sortKey === 'createdAt'" class="ml-1 text-blue-500">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
@@ -286,7 +384,16 @@ onMounted(() => {
                 v-for="(player, index) in filteredScores" 
                 :key="player.id"
                 class="hover:bg-slate-50 transition-colors group"
+                :class="{'bg-blue-50/50': selectedIds.has(player.id) || isSelectAllGlobal}"
               >
+                <td v-if="isDeleteMode" class="p-4 text-center">
+                    <input 
+                        type="checkbox" 
+                        :checked="selectedIds.has(player.id) || isSelectAllGlobal"
+                        @click="toggleSelection(player.id)" 
+                        class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                    />
+                </td>
                 <td class="p-4 text-sm text-slate-500 font-mono">
                   {{ formatDate(player.createdAt) }}
                 </td>
@@ -438,8 +545,12 @@ onMounted(() => {
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
           </div>
           
-          <h3 class="text-lg font-bold text-slate-800 mb-2">Delete Score?</h3>
-          <p class="text-slate-500 text-sm mb-6">Are you sure you want to delete <span class="font-bold text-slate-800">{{ scoreToDelete?.name }}</span>'s score? This action cannot be undone.</p>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">{{ scoreToDelete ? 'Delete Score?' : 'Delete Selected Scores?' }}</h3>
+          <p class="text-slate-500 text-sm mb-6">
+            <span v-if="scoreToDelete">Are you sure you want to delete <span class="font-bold text-slate-800">{{ scoreToDelete.name }}</span>'s score?</span>
+            <span v-else>Are you sure you want to delete <span class="font-bold text-red-600">{{ selectedCount.toLocaleString() }}</span> selected items?</span> 
+            This action cannot be undone.
+          </p>
           
           <div class="flex gap-3 justify-center">
             <button 
