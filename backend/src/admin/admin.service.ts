@@ -53,4 +53,9 @@ export class AdminService implements OnModuleInit {
     async remove(id: number): Promise<void> {
         await this.adminRepository.delete(id);
     }
+
+    async changePassword(id: number, newPassword: string): Promise<void> {
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await this.adminRepository.update(id, { password: hashedPassword });
+    }
 }
