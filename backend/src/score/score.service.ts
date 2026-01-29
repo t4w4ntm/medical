@@ -84,7 +84,14 @@ export class ScoreService {
   }
   async getDashboardStats() {
     // 1. Overview
-    const totalParticipants = await this.scoreRepository.count();
+    // Calculate total participants by splitting comma-separated names
+    // Formula: Sum(Length(name) - Length(Replace(name, ',', '')) + 1)
+    const countResult = await this.scoreRepository.query(`
+      SELECT SUM(LENGTH(player_name) - LENGTH(REPLACE(player_name, ',', '')) + 1) as total
+      FROM game_sessions
+    `);
+    const totalParticipants = Number(countResult[0].total) || 0;
+
     const { avgTime } = await this.scoreRepository
       .createQueryBuilder('score')
       .select('AVG(score.time)', 'avgTime')
