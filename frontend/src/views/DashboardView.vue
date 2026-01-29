@@ -212,15 +212,15 @@ onMounted(() => {
                   <div class="mt-4 space-y-2">
                        <div class="flex justify-between text-xs">
                            <span class="flex items-center gap-2 font-medium text-slate-600"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Excellent (>800)</span>
-                           <span class="font-bold text-slate-800">{{ stats?.performance.excellent }} คน</span>
+                           <span class="font-bold text-slate-800">{{ stats?.performance.excellent }} ทีม</span>
                        </div>
                        <div class="flex justify-between text-xs">
                            <span class="flex items-center gap-2 font-medium text-slate-600"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Average (500-800)</span>
-                           <span class="font-bold text-slate-800">{{ stats?.performance.average }} คน</span>
+                           <span class="font-bold text-slate-800">{{ stats?.performance.average }} ทีม</span>
                        </div>
                        <div class="flex justify-between text-xs">
                            <span class="flex items-center gap-2 font-medium text-slate-600"><span class="w-2 h-2 rounded-full bg-red-500"></span> Need Improve (<500)</span>
-                           <span class="font-bold text-slate-800">{{ stats?.performance.needImprove }} คน</span>
+                           <span class="font-bold text-slate-800">{{ stats?.performance.needImprove }} ทีม</span>
                        </div>
                   </div>
               </div>
