@@ -256,6 +256,20 @@ const filteredScores = computed(() => {
   })
 })
 
+const groupedDetails = computed(() => {
+   if (!selectedPlayer.value?.details) return []
+   const map = new Map<string, ScoreDetail[]>()
+   
+   selectedPlayer.value.details.forEach(d => {
+       const key = d.questionText || 'General Questions'
+       if (!map.has(key)) map.set(key, [])
+       map.get(key)!.push(d)
+   })
+   
+   return Array.from(map.entries()).map(([question, answers]) => ({ question, answers }))
+})
+
+
 onMounted(() => {
   const userStr = localStorage.getItem('user')
   if (userStr) {
