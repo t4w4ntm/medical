@@ -12,6 +12,9 @@ export class ScoreDetail {
     @Column({ name: 'choice_text' })
     choiceText: string;
 
+    @Column({ name: 'question_text', nullable: true })
+    questionText: string;
+
     @Column({ name: 'is_correct' })
     isCorrect: boolean;
 

@@ -1,6 +1,7 @@
 export class CreateScoreDetailDto {
     choiceId: string;
     choiceText: string;
+    questionText?: string; // Optional for compatibility
     isCorrect: boolean;
     wasClicked: boolean;
     attemptNo: number;
