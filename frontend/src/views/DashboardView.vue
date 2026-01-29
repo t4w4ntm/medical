@@ -28,6 +28,7 @@ ChartJS.register(
 
 // Data and State
 const loading = ref(true)
+const errorMessage = ref('')
 const stats = ref<{
     overview: { totalParticipants: number, avgTime: number, avgQuestionScore: number },
     performance: { excellent: number, average: number, needImprove: number },
@@ -87,15 +88,18 @@ const formatTime = (seconds: number) => {
 
 // Fetch Data
 const fetchDashboardStats = async () => {
+    loading.value = true
+    errorMessage.value = ''
     try {
         const apiUrl = import.meta.env.VITE_API_URL || 'https://medical-production-396d.up.railway.app'
+        console.log('Fetching stats from:', apiUrl) // Debug log
+        
         const res = await fetch(`${apiUrl}/score/dashboard/stats`)
         if (res.ok) {
             const data = await res.json()
             stats.value = data
-
-            // Update Charts
-            if (data.trend) {
+            // ... chart updates ...
+             if (data.trend) {
                 trendChartData.value = {
                     labels: data.trend.map((t: any) => t.date),
                     datasets: [{
@@ -121,8 +125,12 @@ const fetchDashboardStats = async () => {
                     }]
                 }
             }
+        } else {
+            errorMessage.value = `Failed to load data. Status: ${res.status} ${res.statusText} from ${apiUrl}`
+            console.error(errorMessage.value)
         }
-    } catch (error) {
+    } catch (error: any) {
+        errorMessage.value = `Error connecting to server: ${error.message}`
         console.error("Failed to fetch dashboard stats", error)
     } finally {
         loading.value = false
@@ -142,6 +150,14 @@ onMounted(() => {
       </header>
 
       <div v-if="loading" class="text-center py-20 text-slate-400">Loading dashboard...</div>
+      
+      <div v-else-if="errorMessage" class="text-center py-20">
+          <div class="text-red-500 font-bold mb-2">Failed to load data</div>
+          <p class="text-slate-500 text-sm">{{ errorMessage }}</p>
+          <p class="text-slate-400 text-xs mt-4">
+            If you are running backend locally, make sure VITE_API_URL is set to http://localhost:3000
+          </p>
+      </div>
 
       <div v-else>
           <!-- Stat Cards Grid -->
