@@ -36,4 +36,9 @@ export class ScoreController {
   removeBulk(@Body() body: { ids: number[], deleteAll: boolean }) {
     return this.scoreService.removeBulk(body.ids, body.deleteAll);
   }
+
+  @Get('dashboard/stats')
+  getDashboardStats() {
+    return this.scoreService.getDashboardStats();
+  }
 }

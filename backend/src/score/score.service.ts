@@ -4,11 +4,15 @@ import { Repository } from 'typeorm';
 import { CreateScoreDto } from './dto/create-score.dto';
 import { Score } from './entities/score.entity';
 
+import { ScoreDetail } from './entities/score-detail.entity';
+
 @Injectable()
 export class ScoreService {
   constructor(
     @InjectRepository(Score)
     private scoreRepository: Repository<Score>,
+    @InjectRepository(ScoreDetail)
+    private scoreDetailRepository: Repository<ScoreDetail>,
   ) { }
 
   // ฟังก์ชันบันทึกคะแนน
@@ -77,5 +81,64 @@ export class ScoreService {
 
       return this.scoreRepository.remove(scores);
     }
+  }
+  async getDashboardStats() {
+    // 1. Overview
+    const totalParticipants = await this.scoreRepository.count();
+    const { avgTime } = await this.scoreRepository
+      .createQueryBuilder('score')
+      .select('AVG(score.time)', 'avgTime')
+      .getRawOne();
+    const { avgQuestionScore } = await this.scoreRepository
+      .createQueryBuilder('score')
+      .select('AVG(score.questionScore)', 'avgQuestionScore')
+      .getRawOne();
+
+    // 2. Performance Levels
+    // Simple count is safer and faster unless we want one query.
+    const excellent = await this.scoreRepository.count({ where: { totalScore: 801 /* MoreThan(800) equivalent or use query builder for range */ } });
+    // Wait, let's use QueryBuilder for standardized ranges
+    const levels = await this.scoreRepository
+      .createQueryBuilder('score')
+      .select(`SUM(CASE WHEN score.total_score >= 800 THEN 1 ELSE 0 END)`, 'excellent')
+      .addSelect(`SUM(CASE WHEN score.total_score >= 500 AND score.total_score < 800 THEN 1 ELSE 0 END)`, 'average')
+      .addSelect(`SUM(CASE WHEN score.total_score < 500 THEN 1 ELSE 0 END)`, 'needImprove')
+      .getRawOne();
+
+    // 3. Trend (Last 7 days)
+    // Using MySQL syntax as per user environment likely.
+    const trend = await this.scoreRepository.query(`
+        SELECT DATE_FORMAT(created_at, '%Y-%m-%d') as date, AVG(total_score) as avgScore 
+        FROM game_sessions 
+        GROUP BY DATE_FORMAT(created_at, '%Y-%m-%d') 
+        ORDER BY date ASC 
+        LIMIT 7
+    `);
+
+    // 4. Question Analysis
+    const questionAnalysis = await this.scoreDetailRepository.createQueryBuilder('detail')
+      .select('detail.scenario', 'scenario')
+      .addSelect('detail.questionText', 'question')
+      .addSelect('SUM(CASE WHEN detail.isCorrect = 1 THEN 1 ELSE 0 END)', 'correct')
+      .addSelect('SUM(CASE WHEN detail.isCorrect = 0 THEN 1 ELSE 0 END)', 'wrong')
+      .where('detail.questionText IS NOT NULL')
+      .groupBy('detail.scenario')
+      .addGroupBy('detail.questionText')
+      .getRawMany();
+
+    return {
+      overview: {
+        totalParticipants,
+        avgTime: Math.round(Number(avgTime) || 0),
+        avgQuestionScore: Math.round(Number(avgQuestionScore) || 0)
+      },
+      performance: {
+        excellent: Number(levels.excellent) || 0,
+        average: Number(levels.average) || 0,
+        needImprove: Number(levels.needImprove) || 0
+      },
+      trend,
+      questionAnalysis
+    };
   }
 }
