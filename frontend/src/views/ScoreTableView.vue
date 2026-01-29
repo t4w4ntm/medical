@@ -317,14 +317,7 @@ onMounted(() => {
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold border-b border-slate-200 select-none">
-                <th v-if="isDeleteMode" class="p-4 w-12 text-center">
-                    <input 
-                        type="checkbox" 
-                        :checked="isSelectAllGlobal" 
-                        @click="toggleSelectAll"
-                        class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
-                    />
-                </th>
+
                 <th @click="sortBy('createdAt')" class="p-4 w-32 cursor-pointer hover:bg-slate-100 transition-colors group">
                   Date
                   <span v-if="sortKey === 'createdAt'" class="ml-1 text-blue-500">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
@@ -350,6 +343,14 @@ onMounted(() => {
                   <span v-if="sortKey === 'totalScore'" class="ml-1 text-blue-500">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
                 </th>
                 <th class="p-4 text-center w-24">Action</th>
+                <th v-if="isDeleteMode" class="p-4 w-12 text-center">
+                    <input 
+                        type="checkbox" 
+                        :checked="isSelectAllGlobal" 
+                        @click="toggleSelectAll"
+                        class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                    />
+                </th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -359,14 +360,7 @@ onMounted(() => {
                 class="hover:bg-slate-50 transition-colors group"
                 :class="{'bg-blue-50/50': selectedIds.has(player.id)}"
               >
-                <td v-if="isDeleteMode" class="p-4 text-center">
-                    <input 
-                        type="checkbox" 
-                        :checked="selectedIds.has(player.id)"
-                        @click="toggleSelection(player.id)" 
-                        class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
-                    />
-                </td>
+
                 <td class="p-4 text-sm text-slate-500 font-mono">
                   {{ formatDate(player.createdAt) }}
                 </td>
@@ -402,6 +396,14 @@ onMounted(() => {
                       Delete
                     </button>
                   </div>
+                </td>
+                <td v-if="isDeleteMode" class="p-4 text-center">
+                    <input 
+                        type="checkbox" 
+                        :checked="selectedIds.has(player.id)"
+                        @click="toggleSelection(player.id)" 
+                        class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                    />
                 </td>
               </tr>
               
