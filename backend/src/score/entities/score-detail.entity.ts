@@ -15,6 +15,9 @@ export class ScoreDetail {
     @Column({ name: 'question_text', nullable: true })
     questionText: string;
 
+    @Column({ name: 'scenario', nullable: true })
+    scenario: string;
+
     @Column({ name: 'is_correct' })
     isCorrect: boolean;
 

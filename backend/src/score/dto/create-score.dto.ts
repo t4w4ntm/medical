@@ -2,6 +2,7 @@ export class CreateScoreDetailDto {
     choiceId: string;
     choiceText: string;
     questionText?: string; // Optional for compatibility
+    scenario?: string;      // Scenario Name
     isCorrect: boolean;
     wasClicked: boolean;
     attemptNo: number;
@@ -9,6 +10,7 @@ export class CreateScoreDetailDto {
 
 export class CreateScoreDto {
     name: string;           // ชื่อที่ผู้ใช้ตั้ง
+
     time: number;           // เวลาที่ใช้ (วินาที)
     timeScore: number;      // คะแนนจากเวลา
     questionScore: number;  // คะแนนจากการตอบคำถาม
