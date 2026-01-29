@@ -445,7 +445,7 @@ onMounted(() => {
           <div class="bg-slate-50 p-6 border-b border-slate-100 flex justify-between items-center">
             <div>
               <h2 class="text-xl font-bold text-slate-800">Session Details</h2>
-              <p class="text-slate-500 text-sm" v-if="selectedPlayer">Player: <span class="font-bold text-blue-600">{{ selectedPlayer.name }}</span> (ID: {{selectedPlayer.id}})</p>
+              <p class="text-slate-500 text-sm" v-if="selectedPlayer">Player: <span class="font-bold text-blue-600">{{ selectedPlayer.name }}</span></p>
             </div>
             <button @click="closeModal" class="text-slate-400 hover:text-slate-600">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
