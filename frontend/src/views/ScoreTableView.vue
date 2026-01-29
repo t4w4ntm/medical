@@ -34,7 +34,7 @@ const searchTerm = ref('')
 // Pagination
 const currentPage = ref(1)
 const totalPages = ref(1)
-const limit = ref(10)
+const limit = ref(10000) // Show all (as per request)
 const totalItems = ref(0)
 // Removed handleLogout as it is in Sidebar now
 
@@ -163,7 +163,7 @@ const deleteScore = async () => {
       } finally {
         deleting.value = false
       }
-  } else if (selectedIds.value.size > 0 || isSelectAllGlobal.value) {
+  } else if (selectedIds.value.size > 0) {
       deleting.value = true
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'https://medical-production-396d.up.railway.app'
@@ -172,21 +172,17 @@ const deleteScore = async () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 ids: Array.from(selectedIds.value),
-                deleteAll: isSelectAllGlobal.value
+                deleteAll: false // Always sending IDs now
             })
         })
 
         if (res.ok) {
-            if (isSelectAllGlobal.value) {
-                scores.value = []
-                totalItems.value = 0
-            } else {
-                scores.value = scores.value.filter(s => !selectedIds.value.has(s.id))
-                totalItems.value -= selectedIds.value.size
-            }
+            scores.value = scores.value.filter(s => !selectedIds.value.has(s.id))
+            totalItems.value = scores.value.length
+            
             selectedIds.value.clear()
             isSelectAllGlobal.value = false
-            fetchScores(currentPage.value) // Refresh to fill page
+            // fetchScores(1) // No need to re-fetch if we update locally, acts faster
             closeDeleteModal()
         } else {
             console.error('Failed to bulk delete')
@@ -204,41 +200,36 @@ const selectedIds = ref<Set<number>>(new Set())
 const isSelectAllGlobal = ref(false)
 
 const toggleSelectAll = () => {
-    isSelectAllGlobal.value = !isSelectAllGlobal.value
     if (isSelectAllGlobal.value) {
-        // Select logic implies we consider EVERYTHING selected
-        selectedIds.value.clear() // Clear explicit IDs because 'Global' overrides
-    } else {
+        // Was checked, now uncheck all
+        isSelectAllGlobal.value = false
         selectedIds.value.clear()
+    } else {
+        // Was unchecked, now check all loaded items
+        isSelectAllGlobal.value = true
+        // Add all filtered IDs (or all loaded IDs)
+        // Better to select visible/filtered items if search is active? 
+        // User asked for "everyone", usually means all in list. 
+        // We use filteredScores to respect search results if any, or scores if no search.
+        // Let's use filteredScores for better UX (delete what you see).
+        filteredScores.value.forEach(s => selectedIds.value.add(s.id))
     }
 }
 
 const toggleSelection = (id: number) => {
-    if (isSelectAllGlobal.value) {
-        // If unchecking while global select is on, we turn off global select 
-        // and ideally should select all OTHER items. 
-        // But since we don't have all IDs, we simplify:
-        // Turn off global, clear everything, and let user select manually (or just warn).
-        // Better UX for this specific prompt: Just turn off global select.
+    if (selectedIds.value.has(id)) {
+        selectedIds.value.delete(id)
         isSelectAllGlobal.value = false
-        selectedIds.value.clear()
-        // Ideally we would populate with all visible IDs except this one, but that's just for current page.
-        // Let's select all on current page except this one to be helpful.
-        scores.value.forEach(s => {
-            if (s.id !== id) selectedIds.value.add(s.id)
-        })
     } else {
-        if (selectedIds.value.has(id)) {
-            selectedIds.value.delete(id)
-        } else {
-            selectedIds.value.add(id)
+        selectedIds.value.add(id)
+        // If we selected the last one, mark global true (optional UI polish)
+        if (selectedIds.value.size === filteredScores.value.length && filteredScores.value.length > 0) {
+            isSelectAllGlobal.value = true
         }
     }
 }
 
-const selectedCount = computed(() => {
-    return isSelectAllGlobal.value ? totalItems.value : selectedIds.value.size
-})
+const selectedCount = computed(() => selectedIds.value.size)
 
 const confirmBulkDelete = () => {
     if (selectedCount.value === 0) return
@@ -316,27 +307,9 @@ onMounted(() => {
                 Delete ({{ selectedCount.toLocaleString() }})
             </button>
           </div>
-
-          <!-- Pagination Row -->
-          <div class="flex items-center gap-2">
-             <button 
-                @click="changePage(currentPage - 1)" 
-                :disabled="currentPage === 1"
-                class="p-1.5 hover:text-blue-600 disabled:opacity-30 transition-colors text-slate-400"
-             >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-             </button>
-             <span class="text-xs font-bold text-slate-400 font-mono">{{ currentPage }} / {{ totalPages }}</span>
-             <button 
-                @click="changePage(currentPage + 1)" 
-                :disabled="currentPage === totalPages"
-                class="p-1.5 hover:text-blue-600 disabled:opacity-30 transition-colors text-slate-400"
-             >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-             </button>
-          </div>
         </div>
       </header>
+
 
       <!-- Table Section -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -384,12 +357,12 @@ onMounted(() => {
                 v-for="(player, index) in filteredScores" 
                 :key="player.id"
                 class="hover:bg-slate-50 transition-colors group"
-                :class="{'bg-blue-50/50': selectedIds.has(player.id) || isSelectAllGlobal}"
+                :class="{'bg-blue-50/50': selectedIds.has(player.id)}"
               >
                 <td v-if="isDeleteMode" class="p-4 text-center">
                     <input 
                         type="checkbox" 
-                        :checked="selectedIds.has(player.id) || isSelectAllGlobal"
+                        :checked="selectedIds.has(player.id)"
                         @click="toggleSelection(player.id)" 
                         class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
                     />
