@@ -50,10 +50,10 @@ onUnmounted(() => {
   <aside class="w-64 bg-[#11315B] text-white flex flex-col h-screen fixed left-0 top-0 z-50 font-sans shadow-xl">
     <!-- Logo Area -->
     <div class="h-24 flex items-center gap-4 px-6 mt-4 mb-2">
-      <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shrink-0 shadow-lg">
-        <img src="@/assets/Logo.png" alt="GoldMed Logo" class="w-10 h-10 object-contain">
+      <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shrink-0 shadow-lg">
+        <img src="@/assets/Logo.png" alt="GoldMed Logo" class="w-12 h-12 object-contain">
       </div>
-      <h1 class="text-2xl font-black tracking-wide">GoldMed</h1>
+      <h1 class="text-3xl font-black tracking-wide">GoldMed</h1>
     </div>
 
     <!-- Menu -->
