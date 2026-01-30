@@ -35,7 +35,7 @@ const handleLogin = async () => {
     localStorage.setItem('isAuthenticated', 'true')
     localStorage.setItem('user', JSON.stringify(data.user))
     
-    router.push('/table') // Go to table page after login
+    router.push('/dashboard') // Go to dashboard page after login
   } catch (err) {
     errorMsg.value = 'Invalid username or password'
   } finally {
