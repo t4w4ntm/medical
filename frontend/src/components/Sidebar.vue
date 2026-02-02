@@ -58,16 +58,16 @@ onUnmounted(() => {
     :class="collapsed ? 'w-20' : 'w-64'"
   >
     <!-- Logo Area -->
-    <div class="h-24 flex items-center px-4 mt-4 mb-2 relative" :class="collapsed ? 'justify-center' : 'gap-4'">
+    <div class="h-24 flex items-center mt-4 mb-2 relative transition-all duration-300" :class="collapsed ? 'justify-center px-0' : 'justify-start px-6 gap-3'">
       <div 
-        v-show="!collapsed"
-        class="bg-white rounded-full flex items-center justify-center shrink-0 shadow-lg transition-all duration-300 w-12 h-12"
+        class="bg-white rounded-full flex items-center justify-center shrink-0 shadow-lg transition-all duration-300 overflow-hidden"
+        :class="collapsed ? 'w-0 h-0 opacity-0 m-0' : 'w-10 h-10 opacity-100'"
       >
-        <img src="@/assets/Logo.png" alt="GoldMed Logo" class="object-contain w-10 h-10">
+        <img src="@/assets/Logo.png" alt="GoldMed Logo" class="object-contain w-8 h-8">
       </div>
       <h1 
-        v-show="!collapsed"
         class="text-2xl font-black tracking-wide whitespace-nowrap overflow-hidden transition-all duration-300 origin-left"
+        :class="collapsed ? 'w-0 opacity-0 scale-0' : 'w-auto opacity-100 scale-100'"
       >
         GoldMed
       </h1>
@@ -75,8 +75,7 @@ onUnmounted(() => {
       <!-- Toggle Button (Hamburger) -->
       <button 
         @click="$emit('toggle')"
-        class="absolute top-0 text-slate-300 hover:text-white p-1 rounded-md transition-all duration-300 z-50"
-        :class="collapsed ? 'right-6' : 'right-3'"
+        class="text-slate-300 hover:text-white p-1 rounded-md transition-all duration-300 z-50 shrink-0"
         :title="collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
       >
          <svg class="w-8 h-8 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
