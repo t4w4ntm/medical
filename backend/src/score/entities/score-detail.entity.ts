@@ -18,6 +18,9 @@ export class ScoreDetail {
     @Column({ name: 'scenario', nullable: true })
     scenario: string;
 
+    @Column({ name: 'patient_index', nullable: true, default: 0 })
+    patientIndex: number;
+
     @Column({ name: 'is_correct' })
     isCorrect: boolean;
 

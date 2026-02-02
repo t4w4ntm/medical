@@ -8,6 +8,8 @@ interface ScoreDetail {
   choiceId: string
   choiceText: string
   questionText?: string
+  scenario?: string
+  patientIndex?: number
   isCorrect: boolean
   wasClicked: boolean
   attemptNo: number
@@ -261,7 +263,13 @@ const groupedDetails = computed(() => {
    const map = new Map<string, ScoreDetail[]>()
    
    selectedPlayer.value.details.forEach(d => {
-       const key = d.questionText || 'General Questions'
+       // Group by Question Text + Patient Index (if available)
+       let key = d.questionText || 'General Questions'
+       
+       if (d.patientIndex !== undefined && d.patientIndex !== null) {
+           key += ` (Patient ${d.patientIndex + 1})`
+       }
+       
        if (!map.has(key)) map.set(key, [])
        map.get(key)!.push(d)
    })

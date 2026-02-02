@@ -3,6 +3,7 @@ export class CreateScoreDetailDto {
     choiceText: string;
     questionText?: string; // Optional for compatibility
     scenario?: string;      // Scenario Name
+    patientIndex?: number;  // Patient Index (0, 1, 2...)
     isCorrect: boolean;
     wasClicked: boolean;
     attemptNo: number;
