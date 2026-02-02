@@ -263,6 +263,9 @@ const groupedDetails = computed(() => {
    const map = new Map<string, ScoreDetail[]>()
    
    selectedPlayer.value.details.forEach(d => {
+       // Filter out unattempted choices
+       if (!d.attemptNo || d.attemptNo === 0) return
+
        // Group by Question Text + Patient Index (if available)
        let key = d.questionText || 'General Questions'
        
@@ -274,7 +277,11 @@ const groupedDetails = computed(() => {
        map.get(key)!.push(d)
    })
    
-   return Array.from(map.entries()).map(([question, answers]) => ({ question, answers }))
+   // Sort answers by attemptNo
+   return Array.from(map.entries()).map(([question, answers]) => ({ 
+       question, 
+       answers: answers.sort((a, b) => a.attemptNo - b.attemptNo) 
+   }))
 })
 
 
