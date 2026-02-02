@@ -75,8 +75,8 @@ onUnmounted(() => {
       <!-- Toggle Button (Hamburger) -->
       <button 
         @click="$emit('toggle')"
-        class="text-slate-300 hover:text-white p-1 rounded-md transition-colors z-50"
-        :class="collapsed ? 'static' : 'absolute right-3 top-0'"
+        class="absolute top-0 text-slate-300 hover:text-white p-1 rounded-md transition-all duration-300 z-50"
+        :class="collapsed ? 'right-6' : 'right-3'"
         :title="collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
       >
          <svg class="w-8 h-8 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
