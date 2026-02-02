@@ -40,6 +40,8 @@ const fetchAdmins = async () => {
   }
 }
 
+const showSuccessModal = ref(false)
+
 const handleCreateAdmin = async () => {
     if(!newUsername.value || !newPassword.value) {
         errorMsg.value = 'Please fill in all fields'
@@ -71,6 +73,7 @@ const handleCreateAdmin = async () => {
         closeModal()
         newUsername.value = ''
         newPassword.value = ''
+        showSuccessModal.value = true // Show success modal
     } catch (err) {
         errorMsg.value = 'Failed to create user. Username might be taken.'
     } finally {
