@@ -2,10 +2,11 @@
 import { ref } from 'vue'
 import Sidebar from '../components/Sidebar.vue'
 
-const isCollapsed = ref(false)
+const isCollapsed = ref(localStorage.getItem('sidebarState') === 'collapsed')
 
 const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value
+  localStorage.setItem('sidebarState', isCollapsed.value ? 'collapsed' : 'expanded')
 }
 </script>
 

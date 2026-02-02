@@ -66,8 +66,8 @@ onUnmounted(() => {
         <img src="@/assets/Logo.png" alt="GoldMed Logo" class="object-contain" :class="collapsed ? 'w-8 h-8' : 'w-10 h-10'">
       </div>
       <h1 
-        v-show="!collapsed"
-        class="text-2xl font-black tracking-wide whitespace-nowrap overflow-hidden transition-all duration-300"
+        class="text-2xl font-black tracking-wide whitespace-nowrap overflow-hidden transition-all duration-300 origin-left"
+        :class="collapsed ? 'w-0 opacity-0 scale-0' : 'w-auto opacity-100 scale-100'"
       >
         GoldMed
       </h1>
@@ -99,7 +99,10 @@ onUnmounted(() => {
         <svg class="w-6 h-6 transition-transform group-hover:scale-110 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon"></path>
         </svg>
-        <span v-if="!collapsed" class="text-sm tracking-wide whitespace-nowrap">{{ item.name }}</span>
+        <span 
+            class="text-sm tracking-wide whitespace-nowrap overflow-hidden transition-all duration-300 origin-left"
+            :class="collapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'"
+        >{{ item.name }}</span>
       </router-link>
     </nav>
 
