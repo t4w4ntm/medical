@@ -72,13 +72,13 @@ onUnmounted(() => {
         GoldMed
       </h1>
       
-      <!-- Toggle Button -->
+      <!-- Toggle Button (Hamburger) -->
       <button 
         @click="$emit('toggle')"
-        class="absolute -right-3 top-1/2 -translate-y-1/2 bg-white text-[#11315B] rounded-full p-1 shadow-md hover:bg-slate-100 border border-slate-200 z-50 transform hover:scale-110 transition-transform"
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-white p-1 rounded-md transition-colors z-50"
         :title="collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
       >
-         <svg class="w-4 h-4" :class="{'rotate-180': collapsed}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
       </button>
     </div>
 
