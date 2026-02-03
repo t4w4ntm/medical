@@ -76,10 +76,10 @@ onUnmounted(() => {
       <button 
         @click="$emit('toggle')"
         class="text-slate-300 hover:text-white p-1 rounded-md transition-all duration-300 z-50 shrink-0"
-        :class="collapsed ? '' : 'ml-auto'"
+        :class="collapsed ? '' : 'absolute top-2 right-2'"
         :title="collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
       >
-         <svg class="w-8 h-8 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+         <svg :class="collapsed ? 'w-8 h-8' : 'w-6 h-6'" class="font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="collapsed ? 'M4 6h16M4 12h16M4 18h16' : 'M6 18L18 6M6 6l12 12'"></path>
          </svg>
       </button>
