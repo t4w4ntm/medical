@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import DashboardLayout from '../layouts/DashboardLayout.vue'
 import {
   Chart as ChartJS,
@@ -35,6 +35,49 @@ const stats = ref<{
     trend: { date: string, avgScore: string }[],
     questionAnalysis: { scenario: string, question: string, correct: string, wrong: string }[]
 } | null>(null)
+
+// Sorting State
+const sortOrder = ref<'desc' | 'asc' | null>(null) // null = default, desc = most correct, asc = least correct
+
+const sortedQuestionAnalysis = computed(() => {
+    if (!stats.value?.questionAnalysis) return []
+    
+    // If no sort order, return original array
+    if (!sortOrder.value) return stats.value.questionAnalysis
+
+    // Create a copy to sort
+    const sorted = [...stats.value.questionAnalysis]
+    
+    sorted.sort((a, b) => {
+        const correctA = parseInt(a.correct) || 0
+        const correctB = parseInt(b.correct) || 0
+        
+        // Secondary sort by wrong answers if correct are equal (optional, but good for consistency)
+        if (correctA === correctB) {
+             const wrongA = parseInt(a.wrong) || 0
+             const wrongB = parseInt(b.wrong) || 0
+             // If correct counts are equal, maybe sort by fewer wrongs? 
+             // Let's just stick to correct counts for now as primary.
+             return 0
+        }
+
+        return sortOrder.value === 'desc' 
+            ? correctB - correctA 
+            : correctA - correctB
+    })
+    
+    return sorted
+})
+
+const toggleSort = () => {
+    if (sortOrder.value === null) {
+        sortOrder.value = 'desc' // First click: Most correct first
+    } else if (sortOrder.value === 'desc') {
+        sortOrder.value = 'asc' // Second click: Least correct first
+    } else {
+        sortOrder.value = null // Third click: Back to default
+    }
+}
 
 // Chart Data Configs
 const trendChartData = ref({
@@ -238,11 +281,21 @@ onMounted(() => {
                              <th class="p-4 w-12 text-center">#</th>
                              <th class="p-4">Question Detail</th>
                              <th class="p-4">Scenario</th>
-                             <th class="p-4 text-right">Correct/Wrong</th>
+                             <th 
+                                class="p-4 text-right cursor-pointer hover:bg-slate-100 transition-colors select-none flex items-center justify-end gap-1"
+                                @click="toggleSort"
+                                title="Click to sort by Correct answers"
+                             >
+                                Correct/Wrong
+                                <span class="flex flex-col text-[10px] leading-[8px] text-slate-400">
+                                    <svg :class="{'text-blue-600': sortOrder === 'asc'}" class="w-3 h-3 -mb-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"></path></svg>
+                                    <svg :class="{'text-blue-600': sortOrder === 'desc'}" class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                </span>
+                             </th>
                          </tr>
                      </thead>
                      <tbody class="divide-y divide-slate-100 text-sm">
-                         <tr v-for="(q, i) in stats?.questionAnalysis" :key="i" class="hover:bg-slate-50 transition-colors">
+                         <tr v-for="(q, i) in sortedQuestionAnalysis" :key="i" class="hover:bg-slate-50 transition-colors">
                              <td class="p-4 text-center text-slate-400 font-mono">{{ i + 1 }}</td>
                              <td class="p-4 font-bold text-slate-700">{{ q.question }}</td>
                              <td class="p-4 text-slate-500">{{ q.scenario }}</td>
@@ -252,7 +305,7 @@ onMounted(() => {
                                  <span class="text-red-500">{{ q.wrong }}</span>
                              </td>
                          </tr>
-                         <tr v-if="!stats?.questionAnalysis?.length">
+                         <tr v-if="!sortedQuestionAnalysis?.length">
                              <td colspan="4" class="p-8 text-center text-slate-400">No question data analysis available.</td>
                          </tr>
                      </tbody>
